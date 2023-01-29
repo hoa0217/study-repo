@@ -307,7 +307,7 @@ assertFalse(new Franc(5).equals(new Dollar(5)));
  }
 ```
 모델 코드에 클래스를 이런식으로 사용하는 것은 좀 지저분해 보인다.
-하지만 통화(currency)라는 개념은 혼합된 동화간의 연산에서 필요하므로 추후 도입하자.
+하지만 통화(currency)라는 개념은 혼합된 통화간의 연산에서 필요하므로 추후 도입하자.
 - 더 많은 동기가 있기전 더 많은 설계를 도입하지 말자.
 > * $5 + 10CHF = &10 (환율이 2:1일 경우)
 > * ~~$5 X 2 = &10~~
@@ -319,13 +319,64 @@ assertFalse(new Franc(5).equals(new Dollar(5)));
 > * Equal null
 > * Equal object
 > * ~~5CHF X 2 = 10CHF~~
-> * **Dollar/Franc 중복**
+> * Dollar/Franc 중복
 > * ~~공용 equals~~
-> * **공용 times**
+> * 공용 times
 > * ~~Franc과 Dollar 비교하기~~
 > * 통화?
 <hr/>
 
 ### 8장 객체 만들기
 두 ```times()```구현 코드가 똑같고 하위클래스가 하는 일이 많이 없는 것 같아 제거 하고싶다.
-하위 클래스의 직접적인 참조를 점진적으로 없애보자.
+- 두 변이형 메서드 모두 Money를 반환하도록 서명부를 통일시키자.
+
+그리고 팩토리 메서드를 사용해 하위 클래스의 직접적인 참조를 점진적으로 없애보자.
+- 테스트 코드에서 콘크리트 하위 클래스의 존재를 분리하자.
+> 팩토리 메서드 : `new`연산자를 이용한 객체 생성 호출을 특별한 팩토리 메서드 호출로 대체하는 것
+```java
+ @Test
+ public void testMultiplication() {
+     Money five = Money.dollar(5);
+     assertEquals(new Dollar(10), five.times(2));
+     assertEquals(new Dollar(15), five.times(3));
+ }
+```
+현재 `times()`는 구현할 준비가 되지 않았기 때문에, Money를 추상클래스로 변경한 후 `times()`는 선언만 해준다.
+- 최소한 메서드 선언부 만이라도 공통 상위 클래스로 옮긴다.
+```java
+public abstract class Money {
+    ...
+   // 팩토리 메서드 구현
+   static Money dollar(int amount){
+      return new Dollar(amount);
+   }
+
+   abstract Money times(int multiplier);
+}
+```
+잘 실행되므로 나머지 테스트 들도 하위 클래스를 분리해주자.
+- 이를 통해 어떤 클라이언트 코드도 하위클래스의 존재를 알지 못한다.
+- 하위클래스의 존재를 테스트에서 분리함으로써 어떤 모델 코드에도 영향을 주지 않고 상속 구조를 마음대로 변경할 수 있다.
+
+추가적으로 Franc의 testMultiplication의 검사하는 로직이 Dollar 곱하기 테스트랑 똑같다.
+- 하위 클래스가 분리되면서, 몇몇 테스트가 불필요해 보인다.
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * ~~$5 X 2 = &10~~
+> * ~~amount를 private로 만들기~~
+> * ~~Dollar 부작용(side effect)?~~
+> * Money 반올림
+> * ~~equals()~~
+> * hashCode()
+> * Equal null
+> * Equal object
+> * ~~5CHF X 2 = 10CHF~~
+> * Dollar/Franc 중복
+> * ~~공용 equals~~
+> * 공용 times
+> * ~~Franc과 Dollar 비교하기~~
+> * 통화?
+> * Franc의 testMultiplication을 지워야할까?
+<hr/>
+
+### 9장 우리가 사는 시간
+통화를 표현하기 위해 경량 팩토리(flyweight factories)를 사용할 수 있지만, 당분간 그런 것들을 대신해 문자열을 쓰자.
