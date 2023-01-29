@@ -11,7 +11,8 @@
 > **죄악** : 기존 코드 복사해서 붙이기(copy and paste), 함수가 무조건 특정 상수 반환하기 등
 <hr/>
 
-### Money 객체 예제
+## 화폐 예제
+### 1장 다중 통화를 지원하는 Money객체 
 1. 먼저 작업해야할 테스트 목록을 작성하자.
     - 작업을 시작하면 **굵은 글씨** 로 표시
     - 작업이 끝나면 ~~취소선~~ 으로 표시
@@ -99,7 +100,8 @@
    > * Money 반올림
 <hr/>
 
-연산을 수행한 후 해당 Dollar의 값이 바뀐다. 이러한 부작용을 해결하기위해 times()가 객체를 반환하게 해보자.
+### 2장 타락한 객체
+연산을 수행한 후 해당 Dollar의 값이 바뀐다. 이러한 부작용을 해결하기위해 `times()`가 객체를 반환하게 해보자.
 - 이렇게되려면 테스트도 수정되고, Dollar의 인터페이스도 수정되야한다.
 ```java
 public void testMultiplication() {
@@ -129,11 +131,12 @@ public void testMultiplication() {
 > * Money 반올림
 <hr/>
 
-Dollar는 값 객체 패턴을 사용하고 있다. 따라서 ```equals```를 구현해야한다.
+### 3장 모두를 위한 평등
+Dollar는 값 객체 패턴을 사용하고 있다. 따라서 `equals`를 구현해야한다.
 - $5와 $5는 똑같은 것이기 때문이다.
 > 값 객체 패턴(value object pattern) : 객체를 값 처럼 쓸 수 있는데, 인스턴스 변수가 생성자를 통해 일단 설정된 후 결코 변하지 않는다.
 
-또한 해시테이블의 키로 쓸 생각이라면 ```hashcode```도 함께 구현해야한다.
+또한 해시테이블의 키로 쓸 생각이라면 `hashcode`도 함께 구현해야한다.
 > * $5 + 10CHF = &10 (환율이 2:1일 경우)
 > * ~~$5 X 2 = &10~~
 > * amount를 private로 만들기
@@ -178,6 +181,7 @@ Dollar는 값 객체 패턴을 사용하고 있다. 따라서 ```equals```를 �
 > * Equal object
 <hr/>
 
+### 4장 프라이버시
 동일성을 해결했으니, 첫번째 테스트에서 Dollar와 Dollar를 비교할 수 있다.
 - 테스트와 코드사이의 결합도를 낮추기 위해, 객체의 새기능을 사용해보자.
 ```java
@@ -207,10 +211,11 @@ private int amount;
 - 실패했다면 교훈을 얻고 다시 앞으로 나아가자.
 <hr/>
 
+### 5장 솔직히 말하자면
 > * $5 + 10CHF = &10 (환율이 2:1일 경우)
 
 이 첫번 째 테스트를 처리하기 위해 작은 단계부터 접근하자.
-- 큰테스트를 공략할 수 없기 때문에, 자그마한 테스트를 만들었다.
+- 큰 테스트를 공략할 수 없기 때문에, 자그마한 테스트를 만들었다.
 
 프랑(Franc)을 표현할 수 있는 객체가 필요하고 Dollar와 비슷하게 동작해야한다.
 - 여기서 복붙이라는 엄청난 죄악이 일어나지만 고해성사 할것이다.
@@ -238,12 +243,13 @@ private int amount;
 > * 공용 times
 <hr/>
 
+### 6장 돌아온 `모두를 위한 평등`
 중복을 청소하기 위해, 두 클래스의 공통 상위 클래스를 찾아보자.
 - 만든 클래스 중 하나를 상속받게 하는 것은 구원하지 못한다.
 
-Money라는 공통클래스를 만들고 ```equals```를 위임하자.
+Money라는 공통클래스를 만들고 `equals`를 위임하자.
 - 비교하려면 amount 필드도 필요하므로 같이 위임한다.
-- 하위클래스에서도 볼 수 있도록 가시성을 protected로 지정.
+- 하위클래스에서도 볼 수 있도록 가시성을 `protected`로 지정.
 1. Money class 생성
 2. Dollar, Franc의 상위클래스(Money) 지정 후, amount 변수 Money로 위임
 3. equals를 제거하기 전 Dollar의 equals의 타입을 Money로 바꾼 후 Test
@@ -283,8 +289,43 @@ Money라는 공통클래스를 만들고 ```equals```를 위임하자.
 > * Dollar/Franc 중복
 > * ~~공용 equals~~
 > * 공용 times
+> * **Franc과 Dollar 비교하기**
 <hr/>
-   
-   
-   
-   
+
+### 7장 사과와 오렌지
+Franc과 Dollar를 비교하는 테스트를 추가해보자. (예상된 결함)
+```java
+assertFalse(new Franc(5).equals(new Dollar(5)));
+```
+실패한다. 역시 Dollar를 Franc라고 한다.
+오직 금액과 클래스가 같을 때 두 Money를 같도록 반환하자.
+```java
+ public boolean equals(Object object){
+     Money money = (Money) object;
+     return amount == money.amount
+             && getClass().equals(money.getClass());
+ }
+```
+모델 코드에 클래스를 이런식으로 사용하는 것은 좀 지저분해 보인다.
+하지만 통화(currency)라는 개념은 혼합된 동화간의 연산에서 필요하므로 추후 도입하자.
+- 더 많은 동기가 있기전 더 많은 설계를 도입하지 말자.
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * ~~$5 X 2 = &10~~
+> * ~~amount를 private로 만들기~~
+> * ~~Dollar 부작용(side effect)?~~
+> * Money 반올림
+> * ~~equals()~~
+> * hashCode()
+> * Equal null
+> * Equal object
+> * ~~5CHF X 2 = 10CHF~~
+> * **Dollar/Franc 중복**
+> * ~~공용 equals~~
+> * **공용 times**
+> * ~~Franc과 Dollar 비교하기~~
+> * 통화?
+<hr/>
+
+### 8장 객체 만들기
+두 ```times()```구현 코드가 똑같고 하위클래스가 하는 일이 많이 없는 것 같아 제거 하고싶다.
+하위 클래스의 직접적인 참조를 점진적으로 없애보자.
