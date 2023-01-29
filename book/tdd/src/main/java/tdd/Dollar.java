@@ -7,10 +7,9 @@ public class Dollar {
         this.amount = amount;
     }
 
-    void times(int multiplier) {
-        // amount = 5 * 2;
-        // amount = amount * 2;
-        // amount = amount * multiplier;
-        amount *= multiplier; // 중복제거완료.
+    Dollar times(int multiplier) {
+        // amount *= multiplier;
+        // return null;
+        return new Dollar(amount * multiplier);
     }
 }

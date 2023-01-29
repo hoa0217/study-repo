@@ -11,7 +11,7 @@
 > **죄악** : 기존 코드 복사해서 붙이기(copy and paste), 함수가 무조건 특정 상수 반환하기 등
 <hr/>
 
-### 다중 통화를 지원하는 Money 객체
+### Money 객체 예제
 1. 먼저 작업해야할 테스트 목록을 작성하자.
     - 작업을 시작하면 **굵은 글씨** 로 표시
     - 작업이 끝나면 ~~취소선~~ 으로 표시
@@ -91,14 +91,44 @@
         }
     }
     ```
-   첫 번째 테스트를 완료 표시한다.
+   첫 번째 테스트를 완료 표시하고 다음 항목을 결정한다.
    > * $5 + 10CHF = &10 (환율이 2:1일 경우)
    > * ~~$5 X 2 = &10~~
    > * amount를 private로 만들기
-   > * Dollar 부작용(side effect)?
+   > * **Dollar 부작용(side effect)?**
    > * Money 반올림
-   
-    
+<hr/>
+
+연산을 수행한 후 해당 Dollar의 값이 바뀐다. 이러한 부작용을 해결하기위해 times()가 객체를 반환하게 해보자.
+- 이렇게되려면 테스트도 수정되고, Dollar의 인터페이스도 수정되야한다.
+```java
+   public void testMultiplication() {
+       Dollar five = new Dollar(5);
+       Dollar product = five.times(2);
+       assertEquals(10, five.amount);
+       product = five.times(3);
+       assertEquals(15, five.amount);
+   }
+```
+```java
+    Dollar times(int multiplier) {
+        // amount *= multiplier;
+        //return null;
+        return new Dollar(amount * multiplier);
+    }
+```
+최대한 빨리 초록색을 보기위해 취할 수 있는 전략은 2가지다.
+- 가짜로 구현하기 : 상수를 반환하게 만들고 진짜 코드를 얻을 때까지 단계적으로 상수를 변수로 바꾸어 간다.
+- 명백한 구현 사용하기 : 실제 구현을 입력한다.
+> 느낌(부작용에 대한 혐오감)을 테스트(하나의 Dollar 객체에 곱하기를 두 번 수행하는 것)로 변환하는 것은 TDD의 일반적인 주제이다.
+
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * ~~$5 X 2 = &10~~
+> * amount를 private로 만들기
+> * ~~Dollar 부작용(side effect)?~~
+> * Money 반올림
+<hr/>
+
 
     
     
