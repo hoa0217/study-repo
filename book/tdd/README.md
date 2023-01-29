@@ -490,23 +490,6 @@ public class Dollar extends Money {
 <hr/>
 
 ### 10장 흥미로운 시간
-> * $5 + 10CHF = &10 (환율이 2:1일 경우)
-> * ~~$5 X 2 = &10~~
-> * ~~amount를 private로 만들기~~
-> * ~~Dollar 부작용(side effect)?~~
-> * Money 반올림
-> * ~~equals()~~
-> * hashCode()
-> * Equal null
-> * Equal object
-> * ~~5CHF X 2 = 10CHF~~
-> * Dollar/Franc 중복
-> * ~~공용 equals~~
-> * **공용 times**
-> * ~~Franc과 Dollar 비교하기~~
-> * ~~통화?~~
-> * testFrancMultiplication을 지워야할까?
-
 두  `times()`의 구현이 거의 비슷하지만 아직 완전히 동일하지 않다. 그런데 바꿀 명백한 방법이 없다. 따라서 다시 팩토리 메서드를 인라인 시켜보자
 - 전장에서 그럼 왜 바꾼거야?라는 의문이 드는게 당연하다
 ```java
@@ -621,3 +604,50 @@ but was: tdd.Money@28b887c<Money{amount=10, currency='USD'}>
 <hr/>
 
 ### 11장 모든 악의 근원
+하위 클래스는 달랑 생성자밖에 없기 때문에 제거하자.
+- 하위 클래스에 대한 참조를 Money로 바꿔보자.
+```java
+ static Money dollar(int amount){
+     return new Money(amount, "USD");
+ }
+
+ static Money franc(int amount){
+     return new Money(amount, "CHF");
+ }
+```
+동치성 테스트를 돌려보자. (중복되는 3, 4번째 줄은 지우자.) :arrow_right: 성공
+```java
+ @Test
+ public void testEquality(){
+     assertTrue(Money.dollar(5).equals(Money.dollar(5)));
+     assertFalse(Money.dollar(5).equals(Money.dollar(6)));
+     // assertTrue(Money.franc(5).equals(Money.franc(5)));
+     // assertFalse(Money.franc(5).equals(Money.franc(6)));
+     assertFalse(Money.franc(5).equals(Money.dollar(5)));
+ }
+```
+
+- 클래스 대신 currency를 비교하는 테스트 코드는 여러 클래스가 존재할 때 의미있다.
+   - `testDifferentClassEquality()` 삭제
+- 프랑과 달러에 대한 별도의 테스트들도 로직상 차이가 없다.
+   - `testFrancMultiplication()` 삭제
+
+> * **$5 + 10CHF = &10 (환율이 2:1일 경우)**
+> * ~~$5 X 2 = &10~~
+> * ~~amount를 private로 만들기~~
+> * ~~Dollar 부작용(side effect)?~~
+> * Money 반올림
+> * ~~equals()~~
+> * hashCode()
+> * Equal null
+> * Equal object
+> * ~~5CHF X 2 = 10CHF~~
+> * ~~Dollar/Franc 중복~~
+> * ~~공용 equals~~
+> * ~~공용 times~~
+> * ~~Franc과 Dollar 비교하기~~
+> * ~~통화?~~
+> * ~~testFrancMultiplication을 지워야할까?~~
+<hr/>
+
+### 12장 드디어, 더하기
