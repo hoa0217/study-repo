@@ -102,20 +102,20 @@
 연산을 수행한 후 해당 Dollar의 값이 바뀐다. 이러한 부작용을 해결하기위해 times()가 객체를 반환하게 해보자.
 - 이렇게되려면 테스트도 수정되고, Dollar의 인터페이스도 수정되야한다.
 ```java
-   public void testMultiplication() {
-       Dollar five = new Dollar(5);
-       Dollar product = five.times(2);
-       assertEquals(10, five.amount);
-       product = five.times(3);
-       assertEquals(15, five.amount);
-   }
+public void testMultiplication() {
+    Dollar five = new Dollar(5);
+    Dollar product = five.times(2);
+    assertEquals(10, five.amount);
+    product = five.times(3);
+    assertEquals(15, five.amount);
+}
 ```
 ```java
-    Dollar times(int multiplier) {
-        // amount *= multiplier;
-        //return null;
-        return new Dollar(amount * multiplier);
-    }
+ Dollar times(int multiplier) {
+     // amount *= multiplier;
+     // return null;
+     return new Dollar(amount * multiplier);
+ }
 ```
 최대한 빨리 초록색을 보기위해 취할 수 있는 전략은 2가지다.
 - 가짜로 구현하기 : 상수를 반환하게 만들고 진짜 코드를 얻을 때까지 단계적으로 상수를 변수로 바꾸어 간다.
@@ -129,6 +129,54 @@
 > * Money 반올림
 <hr/>
 
+Dollar는 값 객체 패턴을 사용하고 있다. 따라서 ```equals```를 구현해야한다.
+- $5와 $5는 똑같은 것이기 때문이다.
+> 값 객체 패턴(value object pattern) : 객체를 값 처럼 쓸 수 있는데, 인스턴스 변수가 생성자를 통해 일단 설정된 후 결코 변하지 않는다.
+
+또한 해시테이블의 키로 쓸 생각이라면 ```hashcode```도 함께 구현해야한다.
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * ~~$5 X 2 = &10~~
+> * amount를 private로 만들기
+> * ~~Dollar 부작용(side effect)?~~
+> * Money 반올림
+> * **equals()**
+> * hashCode()
+
+삼각측량을 위해 테스트를 두 개 이상 만들자.
+> 삼각측량 : 라디오 신호를 두 수신국이 감지하고 있을 때, 두 수신국 사이의 거리가 알려져있고, 각 수신국이 신호의 방향을 알고 있다면 그것만으로 충분히 신호의 거리와 방향을 알 수 있다.
+
+```java
+ @Test
+ public void testEquality(){
+     assertTrue(new Dollar(5).equals(new Dollar(5)));
+     assertFalse(new Dollar(5).equals(new Dollar(6)));
+ }
+```
+```java
+ @Override
+ public boolean equals(Object object){
+     // return true;
+     Dollar dollar = (Dollar) object;
+     return amount == dollar.amount;
+ }
+```
+코드와 테스트 사이의 중복을 제거하고 일반적인 해법이 보이면 그 방법대로 구현하면 된다.
+- 테스트를 2번 짜는 것은 비효율적이므로
+
+하지만 설계를 어떻게할지, 리팩토링을 어떻게할지 감이 안온다면 삼각측량을 사용하자.
+삼각 측량은 문제를 **다른 방향**에서 생각해볼 기회를 제공한다.
+
+동일성 문제는 일시적으로 해결됐으나, null값이나 다른 객체들을 비교한다면 문제가 생긴다.
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * ~~$5 X 2 = &10~~
+> * amount를 private로 만들기
+> * ~~Dollar 부작용(side effect)?~~
+> * Money 반올림
+> * ~~equals()~~
+> * hashCode()
+> * Equal null
+> * Equal object
+<hr/>
 
     
     
