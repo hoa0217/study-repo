@@ -374,9 +374,99 @@ public abstract class Money {
 > * ~~공용 equals~~
 > * 공용 times
 > * ~~Franc과 Dollar 비교하기~~
-> * 통화?
+> * **통화?**
 > * Franc의 testMultiplication을 지워야할까?
 <hr/>
 
 ### 9장 우리가 사는 시간
 통화를 표현하기 위해 경량 팩토리(flyweight factories)를 사용할 수 있지만, 당분간 그런 것들을 대신해 문자열을 쓰자.
+```java
+ @Test
+ public void testCurrency(){
+     assertEquals("USD", Money.dollar(1).currency());
+     assertEquals("CHF", Money.franc(1).currency());
+ }
+```
+두 클래스를 모두 포함할 수 있는 동일한 구현을 해보자.
+```java
+public class Dollar extends Money{
+    private String currency;
+    public Dollar(int amount) {
+        this.amount = amount;
+        currency = "USD";
+    }
+
+    Money times(int multiplier) {
+        return new Dollar(amount * multiplier);
+    }
+
+    String currency() {
+        // return "USD";
+        return currency;
+    }
+}
+```
+처음엔 단순 "USD" String을 반환하였지만, 통화를 변수에 저장하는 방식으로 동일하게 구현하여 Money에게 curreny 변수와 메서드를 위임할 수 있게 되었다.
+```java
+public abstract class Money {
+    ...
+   protected String currency;
+    ...
+   String currency(){
+      return currency;
+   }
+}
+```
+추가로 문자열 "USD", "CHF"를 정적 팩토리 메서드로 옮긴다면 두 생성자는 동일해지고 공통구현을 만들 수 있다.
+생성자에 인자(`String currency`)를 추가한 후, 에러가 나는 코드를 고치자.
+```java
+public class Dollar extends Money{
+    public Dollar(int amount, String currency) {
+        this.amount = amount;
+        this.currency = currency;
+    }
+
+    Money times(int multiplier) {
+        // 하던 일(curreny 추가작업)이 끝나고 바꿔야하지만, 짧은 중단이므로 팩토리 메서드로 변환해준다.
+        return Money.dollar(amount * multiplier);
+    }
+}
+```
+```java
+public abstract class Money {
+    ...
+   static Money dollar(int amount){
+      return new Dollar(amount, "USD");
+   }
+
+   static Money franc(int amount){
+      return new Franc(amount, "CHF");
+   }
+   ...
+   }
+}
+```
+두 생성자가 동일해 졌으므로 상위 클래스로 올리자.
+```java
+public abstract class Money {
+    ...
+   public Money(int amount, String currency) {
+      this.amount = amount;
+      this.currency = currency;
+   }
+    ...
+}
+```
+```java
+public class Dollar extends Money {
+   public Dollar(int amount, String currency) {
+      super(amount, currency);
+   }
+   ...
+}
+```
+정리해보면
+- 다른 부분을 팩토리 메서드로 옮김으로써 두 생성자를 일치 시켰다
+  - 다른부분 : `String currency`
+- `times()`가 팩토리 메서드를 사용하도록 만들기 위해 리팩토링을 잠시 중단했다.
+- 동일한 생성자들을 상위 클래스로 올렸다.
