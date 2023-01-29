@@ -632,7 +632,7 @@ but was: tdd.Money@28b887c<Money{amount=10, currency='USD'}>
 - 프랑과 달러에 대한 별도의 테스트들도 로직상 차이가 없다.
    - `testFrancMultiplication()` 삭제
 
-> * **$5 + 10CHF = &10 (환율이 2:1일 경우)**
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
 > * ~~$5 X 2 = &10~~
 > * ~~amount를 private로 만들기~~
 > * ~~Dollar 부작용(side effect)?~~
@@ -651,3 +651,64 @@ but was: tdd.Money@28b887c<Money{amount=10, currency='USD'}>
 <hr/>
 
 ### 12장 드디어, 더하기
+더하기 기능을 좀 더 간단한 예부터 시작해보자.
+- 큰 테스트를 작은 테스트로 줄여서 점차 발전해가자.
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * **$5 + $5 = &10**
+```java
+ @Test
+ public void testSimpleAddition(){
+     Money sum = Money.dollar(5).plus(Money.dollar(5));
+     assertEquals(sum, Money.dollar(10));
+ }
+```
+가짜 구현을 할 수 도 있지만, 어떻게 구현해야할지 명확하다.
+```java
+Money plus(Money addend){
+     return new Money(amount + addend.amount, currency);
+ }
+```
+- 하지만 다중 통화 연산을 어떻게 표현해야할지 쉽지않다.
+- 가지고 있는 객체가 우리가 원하는 방식으로 동작하지 않을 경우, 그 객체와 외부 프로토콜 같으면서 내부 구현은 다른 **새로운 객체(imposter, 타인을 사칭하는 사기꾼)** 을 만들 수 있다.
+- 이 예제는 가능한 메타포 중, Money를 수식의 가장 작은 단위로 보고 연산이 완료되면 환율을 이용해서 결과(Expression)을 단일 통화로 축약하는 방법을 선택했다.
+```java
+@Test
+public void testSimpleAddition(){
+      Money five = Money.dollar(5);
+      Expression sum = five.plus(five);
+      Bank bank = new Bank();
+      // reduce = 축약
+      // Bank(은행)가 Expression에 환율을 적용한다
+      Money reduced = bank.reduce(sum, "USD");
+      assertEquals(Money.dollar(10), reduced);
+}
+```
+> 왜 Bank가 수행 책임을 맡는가?
+> * Expression은 하려고 하는 일의 핵심 객체이며, 가능한 다른 부분에 대해서 모르도록 해야한다.
+>  * 그렇게 해야 오랫 동안 유연할 수 있다.(테스트, 재활용, 이해하기에 모두 쉬움)
+> * Expression관련 오퍼레이션이 많을 거라 추측할 수 있으며, 모든 오퍼레이션을 Expression에 추가한다면 무한히 커질것이다.
+
+컴파일을 위해 Expression 인터페이스를 만들고 Money의 `plus()`메서드에서 반환하도록 하자.
+```java
+public interface Expression {
+}
+```
+```java
+public class Money implements Expression{
+    ...
+   Expression plus(Money addend){
+      return new Money(amount + addend.amount, currency);
+   }
+}
+```
+그리고 Bank 클래스에 reduce()를 구현한다.
+```java
+public class Bank {
+    Money reduce(Expression source, String to){
+        // return null; 컴파일 -> 테스트 실패
+        return Money.dollar(10); // 가짜 구현 -> 테스트 성공
+    }
+}
+```
+이제 리팩토링을 할 준비가 됐다.
+<hr/>
