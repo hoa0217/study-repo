@@ -207,6 +207,37 @@ private int amount;
 - 실패했다면 교훈을 얻고 다시 앞으로 나아가자.
 <hr/>
 
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+
+이 첫번 째 테스트를 처리하기 위해 작은 단계부터 접근하자.
+- 큰테스트를 공략할 수 없기 때문에, 자그마한 테스트를 만들었다.
+
+프랑(Franc)을 표현할 수 있는 객체가 필요하고 Dollar와 비슷하게 동작해야한다.
+- 여기서 복붙이라는 엄청난 죄악이 일어나지만 고해성사 할것이다.
+```java
+ @Test
+ public void testMultiplication() {
+     Franc five = new Franc(5);
+     assertEquals(new Franc(10), five.times(2));
+     assertEquals(new Franc(15), five.times(3));
+ }
+```
+엄청난 중복이 생겼고 이것들을 제거해야한다!!
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * ~~$5 X 2 = &10~~
+> * ~~amount를 private로 만들기~~
+> * ~~Dollar 부작용(side effect)?~~
+> * Money 반올림
+> * ~~equals()~~
+> * hashCode()
+> * Equal null
+> * Equal object
+> * ~~5CHF X 2 = 10CHF~~
+> * Dollar/Franc 중복
+> * 공용 equals
+> * 공용 times
+<hr/>
+
    
    
    
