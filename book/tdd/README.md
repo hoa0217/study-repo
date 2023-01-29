@@ -169,7 +169,7 @@ Dollar는 값 객체 패턴을 사용하고 있다. 따라서 ```equals```를 �
 동일성 문제는 일시적으로 해결됐으나, null값이나 다른 객체들을 비교한다면 문제가 생긴다.
 > * $5 + 10CHF = &10 (환율이 2:1일 경우)
 > * ~~$5 X 2 = &10~~
-> * amount를 private로 만들기
+> * **amount를 private로 만들기**
 > * ~~Dollar 부작용(side effect)?~~
 > * Money 반올림
 > * ~~equals()~~
@@ -178,8 +178,35 @@ Dollar는 값 객체 패턴을 사용하고 있다. 따라서 ```equals```를 �
 > * Equal object
 <hr/>
 
-    
-    
+동일성을 해결했으니, 첫번째 테스트에서 Dollar와 Dollar를 비교할 수 있다.
+- 테스트와 코드사이의 결합도를 낮추기 위해, 객체의 새기능을 사용해보자.
+```java
+ @Test
+ public void testMultiplication() {
+     Dollar five = new Dollar(5);
+     assertEquals(new Dollar(10), five.times(2));
+     assertEquals(new Dollar(15), five.times(3));
+ }
+```
+그리고 amount를 사용하는 코드는 Dollar 자신 뿐이므로 private로 변경하자.
+```java
+private int amount;
+```
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * ~~$5 X 2 = &10~~
+> * ~~amount를 private로 만들기~~
+> * ~~Dollar 부작용(side effect)?~~
+> * Money 반올림
+> * ~~equals()~~
+> * hashCode()
+> * Equal null
+> * Equal object
+
+하지만 **위험한 상황**을 만들었다는 점을 인식하고 진행하자.
+- 만약 동일성 테스트 검증이 실패했다면, 곱하기 테스트 역시 실패할 것이다.
+- 실패했다면 교훈을 얻고 다시 앞으로 나아가자.
+<hr/>
+
    
    
    
