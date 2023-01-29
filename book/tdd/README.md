@@ -234,10 +234,56 @@ private int amount;
 > * Equal object
 > * ~~5CHF X 2 = 10CHF~~
 > * Dollar/Franc 중복
-> * 공용 equals
+> * **공용 equals**
 > * 공용 times
 <hr/>
 
+중복을 청소하기 위해, 두 클래스의 공통 상위 클래스를 찾아보자.
+- 만든 클래스 중 하나를 상속받게 하는 것은 구원하지 못한다.
+
+Money라는 공통클래스를 만들고 ```equals```를 위임하자.
+- 비교하려면 amount 필드도 필요하므로 같이 위임한다.
+- 하위클래스에서도 볼 수 있도록 가시성을 protected로 지정.
+1. Money class 생성
+2. Dollar, Franc의 상위클래스(Money) 지정 후, amount 변수 Money로 위임
+3. equals를 제거하기 전 Dollar의 equals의 타입을 Money로 바꾼 후 Test
+   ```java
+    public boolean equals(Object object){
+        Money money = (Money) object;
+        return amount == money.amount;
+    }
+   ```
+   -  모든 Test가 잘 돌면, Money로 equals 위임
+5. Franc의 equals 타입도 Money로 바꾼 후 Test
+   - 미처 작성하지 않은 Franc의 equals Test작성(이것도 복붙...)
+   ```java
+   @Test
+    public void testEquality(){
+        assertTrue(new Dollar(5).equals(new Dollar(5)));
+        assertFalse(new Dollar(5).equals(new Dollar(6)));
+        assertTrue(new Franc(5).equals(new Franc(5)));
+        assertFalse(new Franc(5).equals(new Franc(6)));
+    }
+   ```
+   - 모든 Test가 잘 돌면, Franc의 equals 제거.
+
+이처럼 한번에 옮기는게 아닌 단계적으로 공통코드를 옮긴다.
+특히 불필요한 구현을 제거하기 전 두 메서드(```equals()```)의 구현을 일치시킴.
+
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * ~~$5 X 2 = &10~~
+> * ~~amount를 private로 만들기~~
+> * ~~Dollar 부작용(side effect)?~~
+> * Money 반올림
+> * ~~equals()~~
+> * hashCode()
+> * Equal null
+> * Equal object
+> * ~~5CHF X 2 = 10CHF~~
+> * Dollar/Franc 중복
+> * ~~공용 equals~~
+> * 공용 times
+<hr/>
    
    
    
