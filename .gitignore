@@ -19,5 +19,6 @@ out/
 ### Java ###
 # Compiled class file
 *.class
+*.jar
 
 
