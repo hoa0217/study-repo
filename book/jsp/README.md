@@ -15,7 +15,7 @@
 > 클라이언트(client) : 프로그램에서 요청하는 쪽 :arrow_right: 웹브라우저   
 > 서버(server) : 요청을 받아 알맞은 기능이나 데이터를 제공하는 쪽 :arrow_right: 웹서버
 
-- 또한 하나의 컴퓨터는 여러개의 웹 서버를 실행할 수 있기 때문에 **포트(port)**번호로 연결한다.
+- 또한 하나의 컴퓨터는 여러개의 웹 서버를 실행할 수 있기 때문에 **포트(port)** 번호로 연결한다.   
 `http://localhost:8080/jsp_war_exploded/` (기본포트 80)
 ### HTML 과 HTTP
 - 렌더링(rendering) : HTML 표준에 따라 알맞은 화면을 생성하는 과정
@@ -37,5 +37,4 @@
   - 웹브라우저로부터 요청이 오면 알맞은 프로그램을 찾아 실행하고 응답을 전송함.   
   <img src="./img/was.jpeg" width="70%">
 
-> 프로젝트 환경설정은 [IntelliJ IDEA로 JSP 프로젝트 생성](https://parkgang.github.io/series/from-jsp-project-setup-to-deployment/create-jsp-project-with-intellij-idea/) 을 참고했다. 
-<hr/>
+> 프로젝트 환경설정은 [IntelliJ IDEA로 JSP 프로젝트 생성](https://parkgang.github.io/series/from-jsp-project-setup-to-deployment/create-jsp-project-with-intellij-idea/) 을 참고했다.
