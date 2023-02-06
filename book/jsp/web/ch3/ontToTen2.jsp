@@ -5,7 +5,7 @@
   Time: 3:36 오전
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
     <title>1-10까지의 합:표현식만 사용</title>
