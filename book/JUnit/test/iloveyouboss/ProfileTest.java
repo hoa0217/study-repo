@@ -1,8 +1,11 @@
 package test.iloveyouboss;
 
 import iloveyouboss.*;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ProfileTest {
     private Profile profile;
