@@ -1,4 +1,4 @@
-package iloveyouboss;
+package iloveyouboss.domain;
 
 import org.junit.Before;
 import org.junit.Ignore;

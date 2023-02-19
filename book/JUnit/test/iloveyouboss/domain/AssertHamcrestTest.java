@@ -1,12 +1,11 @@
-package iloveyouboss;
+package iloveyouboss.domain;
 
-import org.hamcrest.number.IsCloseTo;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.number.IsCloseTo.*;
 import static org.junit.Assert.assertTrue;
 
 public class AssertHamcrestTest {

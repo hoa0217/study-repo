@@ -1,4 +1,4 @@
-package iloveyouboss;
+package iloveyouboss.domain;
 
 public enum Weight {
     MustMatch(Integer.MAX_VALUE),

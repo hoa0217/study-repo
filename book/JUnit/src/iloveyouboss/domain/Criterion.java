@@ -1,4 +1,4 @@
-package iloveyouboss;
+package iloveyouboss.domain;
 
 public class Criterion {
     private Weight weight;

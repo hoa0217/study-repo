@@ -1,10 +1,10 @@
-package iloveyouboss;
+package iloveyouboss.domain;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Profile {
-    private Map<String,Answer> answers = new HashMap<>();
+    private Map<String, Answer> answers = new HashMap<>();
     private int score;
     private String name;
 

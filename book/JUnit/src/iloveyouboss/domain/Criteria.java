@@ -1,4 +1,4 @@
-package iloveyouboss;
+package iloveyouboss.domain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
