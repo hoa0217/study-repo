@@ -17,8 +17,9 @@ public class HellobootApplication {
 
   public static void main(String[] args) {
     GenericApplicationContext applicationContext = new GenericApplicationContext();
-    applicationContext.registerBean(HelloController.class); // 빈 등록
-    applicationContext.refresh(); // 구성정보를 가지고 컨테이너를 초기화하는 작업
+    applicationContext.registerBean(HelloController.class);
+    applicationContext.registerBean(SimpleHelloService.class);
+    applicationContext.refresh();
 
     ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
     WebServer webServer = serverFactory.getWebServer(servletContext -> {
