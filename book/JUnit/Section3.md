@@ -1,47 +1,48 @@
 ## 3부 더 큰 설계 그림
 
 ### 목 객체 사용
-- HTTP호출을 실행하는 테스트의 문제점
-  - 실제 호출에 대한 테스트는 나머지 대다수의 빠른 테스트들에 비해 속도가 느리다.
-  - HTTP API가 항상 가용한지 보장할 수 없다. 통제 밖이다.
-- 해결법 : HTTP에 의존성있는 코드와 분리하여, HTTP 호출을 준비하는 로직, 응답을 생성하는 로직을 테스트한다.
-  - HTTP스텁을 구현하여 테스트하고자하는 클래스에 의존성을 주입한다.
-    > 스텁(stub) : 테스트 용도로 하드 코딩한 값을 반환하는 구현체
-    ```java
-      Http http = (String url) -> 
-         "{\"address\":{"
-         + "\"house_number\":\"324\","
-         + "\"road\":\"North Tejon Street\","
-         + "\"city\":\"Colorado Springs\","
-         + "\"state\":\"Colorado\","
-         + "\"postcode\":\"80903\","
-         + "\"country_code\":\"us\"}"
-         + "}";
-    ```
-  - 의존성 주입이 불가한 형태면, 시스템 설계를 변경한다.
-    ```java
-    public class AddreddRetriever{
-      private Http http;
-    
-      public AddreddRetriever(Http http){
-        this.http = http;
-      }
-      ...
+#### HTTP호출을 실행하는 테스트의 문제점
+- 실제 호출에 대한 테스트는 나머지 대다수의 빠른 테스트들에 비해 속도가 느리다.
+- HTTP API가 항상 가용한지 보장할 수 없다. 통제 밖이다.
+#### 해결법
+- HTTP에 의존성있는 코드와 분리하여, HTTP 호출을 준비하는 로직, 응답을 생성하는 로직을 테스트한다.
+- HTTP스텁을 구현하여 테스트하고자하는 클래스에 의존성을 주입한다.
+  > 스텁(stub) : 테스트 용도로 하드 코딩한 값을 반환하는 구현체
+  ```java
+    Http http = (String url) -> 
+       "{\"address\":{"
+       + "\"house_number\":\"324\","
+       + "\"road\":\"North Tejon Street\","
+       + "\"city\":\"Colorado Springs\","
+       + "\"state\":\"Colorado\","
+       + "\"postcode\":\"80903\","
+       + "\"country_code\":\"us\"}"
+       + "}";
+  ```
+- 의존성 주입이 불가한 형태면, 시스템 설계를 변경한다.
+  ```java
+  public class AddreddRetriever{
+    private Http http;
+  
+    public AddreddRetriever(Http http){
+      this.http = http;
     }
+    ...
+  }
 
-    ```
-    - 변경 영향 : HTTP객체에 대한 의존성을 깔끔하게 선언하고, 인터페이스에 대한 의존성으로 결합도를 느슨하게 해준다.
-    - 다른 방법 : 스텁을 생성자 주입말고 아래와 같은 방법을 활용해도 된다.
-      - 세터(setter)메서드
-      - 팩토리 메서드(factory method)
-      - 추상 팩토리(abstract factory)
-      - 구글 주스(Google Guice)
-      - 스프링(spring)
-- 스텁을 **목(mock)** 으로 변환하기 위해서는? (지능 더하기)
-  - 테스트에 어떤 인자가 기대하는지 명시하기
-  - get()메서드에 넘겨진 인자들을 잡아서 저장하기
-  - get()메서드에 저장된 인자들이 기대하는 인자들인지 테스트가 완료될 때 검증하는 능력 지원하
-  - 하지만 직접 더하기 보단 **Mockito** 를 활용하자.
+  ```
+- 변경 영향 : HTTP객체에 대한 의존성을 깔끔하게 선언하고, 인터페이스에 대한 의존성으로 결합도를 느슨하게 해준다.
+- 다른 방법 : 스텁을 생성자 주입말고 아래와 같은 방법을 활용해도 된다.
+  - 세터(setter)메서드
+  - 팩토리 메서드(factory method)
+  - 추상 팩토리(abstract factory)
+  - 구글 주스(Google Guice)
+  - 스프링(spring)
+#### 스텁을 **목(mock)** 으로 변환하기 위해서는? (지능 더하기)
+- 테스트에 어떤 인자가 기대하는지 명시하기
+- get()메서드에 넘겨진 인자들을 잡아서 저장하기
+- get()메서드에 저장된 인자들이 기대하는 인자들인지 테스트가 완료될 때 검증하는 능력 지원하
+- 하지만 직접 더하기 보단 **Mockito** 를 활용하자.
   ```java
       Http http = mock(Http.class) //mock 인스턴스 합성
       when(http.get(contains("lat=38.000000&lon=-104.000000"))).thenReturn(
@@ -57,10 +58,10 @@
   ```
   - `when()` : 테스트의 기대사항 설정
   - `thenReturn()` : 기대사항이 총족되었을 때 지정된 값 반환
-- **Mockito** 를 활용한 의존성 주입
-  1. `@Mock` 애너테이션을 사용하여 목 인스턴스를 생성한다.
-  2. `@InjectMock` 애너테이션을 붙인 대상 인스턴스 변수를 선언한다.
-  3. 대상 인스턴스를 인스턴스화 한 후 `MockitoAnnotations.initMocks(this)`를 호출한다.
+#### **Mockito** 를 활용한 의존성 주입
+1. `@Mock` 애너테이션을 사용하여 목 인스턴스를 생성한다.
+2. `@InjectMock` 애너테이션을 붙인 대상 인스턴스 변수를 선언한다.
+3. 대상 인스턴스를 인스턴스화 한 후 `MockitoAnnotations.initMocks(this)`를 호출한다.
   ```java
   @Mock private Http http;
   @InjectMocks private AddressRetriever retriever;
@@ -71,20 +72,19 @@
     MockitoAnnotations.initMocks(this); // 목객체 합성 후 주입
   }
   ```
-  - Mokito 는 목객체를 주입하기 위해 _생성자 > 세터 > 필드_ 순서로 탐색한다.
-    - 필드의 경우
-    ```java
-    public class AddreddRetriever{
-      private Http http = new HttpImpl();
-      ...
-    }
+- Mokito 는 목객체를 주입하기 위해 _생성자 > 세터 > 필드_ 순서로 탐색한다.
+  - 필드의 경우
+  ```java
+  public class AddreddRetriever{
+    private Http http = new HttpImpl();
+    ...
+  }
     ```
-- Mock을 올바르게 사용하기위해서
+#### Mock을 올바르게 사용하기위해서
   - 우리는 프로덕션 코드 대신 Mock을 사용하고 있는 것이기 때문에 아래와 같은 항목을 충족하는지 검토해볼 필요가 있음.
     - Mock이 프로덕션 코드의 동작을 올바르게 묘사하고 있는가?
-    - Mock이 프로덕션 코드와는 다른 형식으로 반환하는가?
-    - 프로덕션 코드는 예외를 던지는가? 
-      - 만약 테스트 시 프로덕션 코드를 사용하면 예외가 발생하게끔
+    - Mock이 프로덕션 코드와 같은 형식으로 반환하고 있는가?
+    - 프로덕션 코드는 예외를 던지는가?
     - 프로덕션 코드는 null을 반환하는가?
   > 목은 단위테스트 커버리지의 구멍을 만든다. 따라서 **통합테스트**를 작성해 이 구멍을 막아야한다.
 ---
