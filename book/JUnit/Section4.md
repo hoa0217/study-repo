@@ -47,14 +47,14 @@
     - 스레드를 사용하는 테스트 코드는 느리다.
         - 동시성 문제가 없다는 것을 보장하면서 실행 시간의 범위를 확장해야하기 때문.
 - 멀티스레드 코드를 테스트하는 방법
-    - 스레드 통제와 어플리케이션 코드 사이의 중첩을 최소화하라. (이책에서 다룬 부분)
+    - 스레드와 어플리케이션 코드 사이의 중첩을 최소화하라. (이책에서 다룬 부분)
         - 스레드없이 다량의 어플리케이션 코드를 단위테스트 할 수 있도록 설계 변경하라.
         - 남은 작은 코드에 대해 스레드 집중 테스트를 작성하라.
     - 다른 사람의 작업을 믿어라.
         - java.util.concurrent패키지는 2004년 이후 충분히 오랜시간 검증받았다.
 - 예시코드
     - 각 `MatchSet`에 별도의 스레드를 생성하여 `matches()`반환값을 확인한다.
-    - 이 메서드는 어플리케이션 로직과 스레드 로직을 둘 다 사용한다.
+    - `findMatchingProfiles()`메서드는 어플리케이션 로직과 스레드 로직을 둘 다 사용한다.
 ```java
 public void findMatchingProfiles(
     Criteria criteria,MatchListener listener){
@@ -187,3 +187,173 @@ List<MatchSet> collectMatchSets(Criteria criteria) {
 ---
 ### 데이터베이스 테스트
 - 자바 영속성 API(JPA)를 사용하여 데이터베이스와 통신하는 Controller변수를 활용한 테스트를 작성해야한다.
+- 현 Question Controller를 보면 대부분의 로직은 JPA의 단순한 위임이다.
+    - JAP의 의존성을 고립시켰기 때문에 좋은 설계이나, 테스트 관점에서 `테스트를 작성하는게 의미가 있을까?`라는 의문이 생긴다.
+```java
+public class QuestionController {
+   private Clock clock = Clock.systemUTC();
+   // ...
+
+   private static EntityManagerFactory getEntityManagerFactory() {
+      return Persistence.createEntityManagerFactory("maria-ds");
+   }
+   public Question find(Integer id) {
+      return em().find(Question.class, id);
+   }
+   
+   public List<Question> getAll() {
+      return em()
+         .createQuery("select q from Question q", Question.class)
+         .getResultList();
+   }
+   
+   public List<Question> findWithMatchingText(String text) {
+      String query = 
+         "select q from Question q where q.text like '%" + text + "%'";
+      return em().createQuery(query, Question.class) .getResultList();
+   }
+   
+   public int addPercentileQuestion(String text, String[] answerChoices) {
+      return persist(new PercentileQuestion(text, answerChoices));
+   }
+
+   public int addBooleanQuestion(String text) {
+      return persist(new BooleanQuestion(text));
+   }
+
+   void setClock(Clock clock) {
+      this.clock = clock;
+   }
+   // ...
+
+   void deleteAll() {
+      executeInTransaction(
+         (em) -> em.createNativeQuery("delete from Question")
+                   .executeUpdate());
+   }
+   
+   private void executeInTransaction(Consumer<EntityManager> func) {
+      EntityManager em = em();
+
+      EntityTransaction transaction = em.getTransaction();
+      try {
+         transaction.begin();
+         func.accept(em);
+         transaction.commit();
+      } catch (Throwable t) {
+         t.printStackTrace();
+         transaction.rollback();
+      }
+      finally {
+        em.close();
+      }
+   }
+   
+   private int persist(Persistable object) {
+      object.setCreateTimestamp(clock.instant());
+      executeInTransaction((em) -> em.persist(object));
+      return object.getId();
+   }
+   
+   private EntityManager em() {
+      return getEntityManagerFactory().createEntityManager();
+   }
+}
+```
+- 그 대신 진짜 DB와 성공적으로 상호작용하는 테스트를 작성한다.
+    - 느린테스트이지만, 올바르게 연결되었음을 증명할 수 있다.
+        - 자바코드, 매핑설정(persistence.xml), DB
+#### 데이터 문제
+- 진짜 DB와 상호작용하는 통합 테스트를 작성할 때 데이터와 이를 어떻게 가져올지는 매우 중요한 고려사항이다.
+- 적절한 질의(query)결과가 나온다고 증명하려면 _먼저 적절한 데이터를 생성하고 관리해줘야한다._
+- 가장 간단한 경로는 테스트마다 깨끗한 데이터베이스로 시작하는 것
+    - 매 테스트는 자기가 쓸 데이터를 추가하고 그것으로 작업한다.
+    - 이렇게하면 테스트간 의존성 문제를 최소화할 수 있다.
+- 데이터베이스가 트랜잭션(transaction)을 지원한다면 테스트마다 트랜잭션을 초기화하고, 테스트가 끝나면 롤백한다.
+    - 트랜잭션 처리는 보통 `@Before`와 `@After`메서드에 위임한다.
+> 통합테스트는 필수적이지만 설계와 유지보수가 까다롭다. 단위테스트에서 검증하는 로직을 최대화하는 방향으로 통합테스트 개수와 복잡도를 최소화하자.
+#### 클린 룸 데이터베이스 테스트
+- 코드는 `@Before`와 `@After`모두에서 `deleteAll()`메서드를 호출한다.
+    - 테스트 완료 후 데이터를 보고싶다면 `@After`의 `deleteAll()`를 주석처리한다.
+- 이 테스트는 어플리케이션의 기능을 테스트하는 것이 아니라 질의(query)기능을 테스트하고 있는 것.
+- 암시적으로 controller가 DB에 항목들을 잘 추가하고 있는지 검증한다.
+```java
+public class QuestionControllerTest {
+
+  private QuestionController controller;
+
+  @Before
+  public void create() {
+    controller = new QuestionController();
+    controller.deleteAll();
+  }
+
+  @After
+  public void cleanup() {
+    controller.deleteAll();
+  }
+
+  @Test
+  public void findsPersistedQuestionById() {
+    int id = controller.addBooleanQuestion("question text");
+
+    Question question = controller.find(id);
+
+    assertThat(question.getText(), equalTo("question text"));
+  }
+   ...
+}
+```
+#### controller 목처리
+- 위의 테스트는 DB와의 모든 상호작용을 QuestionController클래스로 고립시키고 테스트했다.
+- QuestionController와 상호작용하는 StatCompiler의 `questionText()`를 테스트해보자.
+    - 참고로 QuestionController클래스는 이제 믿을 수 있으므로 `find()`메서드를 안전하게 스텁으로 만든다.
+```java
+public Map<Integer,String> questionText(List<BooleanAnswer> answers) {
+  Map<Integer,String> questions = new HashMap<>();
+  answers.stream().forEach(answer -> {
+     if (!questions.containsKey(answer.getQuestionId()))
+        questions.put(answer.getQuestionId(), 
+           controller.find(answer.getQuestionId()).getText()); });
+  return questions;
+}
+```
+> 목에 대해 가정을 세운다고 생각하라. 테스트에 잘못된 가정을 포함시키면 안된다.
+- Mokito를 활용한 테스트
+```java
+public class StatCompilerTest {
+  ...
+   @Mock private QuestionController controller;
+   @InjectMocks private StatCompiler stats;
+
+   @Before
+   public void initialize() {
+      stats = new StatCompiler();
+      MockitoAnnotations.initMocks(this);
+   }
+
+   @Test
+   public void questionTextDoesStuff() {
+      when(controller.find(1)).thenReturn(new BooleanQuestion("text1"));
+      when(controller.find(2)).thenReturn(new BooleanQuestion("text2"));
+      List<BooleanAnswer> answers = new ArrayList<>();
+      answers.add(new BooleanAnswer(1, true));
+      answers.add(new BooleanAnswer(2, true));
+
+      Map<Integer, String> questionText = stats.questionText(answers);
+
+      Map<Integer, String> expected = new HashMap<>();
+      expected.put(1, "text1");
+      expected.put(2, "text2");
+      assertThat(questionText, equalTo(expected));
+   }
+}
+```
+> Mokito에 대해 잘 알지 못해도 테스트를 읽고 빠르게 그 의도를 이해할 수 있다.
+
+#### 결론
+- **관심사를 분리**하라. 특히 어플리케이션 로직은 스레드, 데이터베이스 혹은 문제를 일으킬 수 있는 다른 의존성과 분리해야한다.
+    - 의존적인 코드는 고립시켜서 테스트하라.
+- 느리거나 휘발적인 코드는 **목으로 대체**하여 단위테스트의 의존성을 끊어라.
+- 필요한 경우 **통합 테스트**로 작성화되, 단순하고 집중적으로 만들어라.
+---

@@ -52,8 +52,12 @@ public class QuestionController {
 
    void deleteAll() {
       executeInTransaction(
-         (em) -> em.createNativeQuery("delete from Question")
-                   .executeUpdate());
+          (em) -> em.createNativeQuery("delete from answerchoice")
+              .executeUpdate());
+
+      executeInTransaction(
+          (em) -> em.createNativeQuery("delete from question")
+              .executeUpdate());
    }
    
    private void executeInTransaction(Consumer<EntityManager> func) {

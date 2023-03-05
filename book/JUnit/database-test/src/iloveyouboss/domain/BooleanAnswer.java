@@ -6,12 +6,22 @@
  * We make no guarantees that this code is fit for any purpose. 
  * Visit http://www.pragmaticprogrammer.com/titles/utj2 for more book information.
 ***/
-package util;
+package iloveyouboss.domain;
 
-public class InvariantException extends RuntimeException {
-   public InvariantException(String message) {
-      super(message);
+class BooleanAnswer {
+   private int questionId;
+   private boolean value;
+
+   BooleanAnswer(int questionId, boolean value) {
+      this.questionId = questionId;
+      this.value = value;
    }
 
-   private static final long serialVersionUID = 1L;
+   boolean getValue() {
+      return value;
+   }
+
+   int getQuestionId() {
+      return questionId;
+   }
 }
