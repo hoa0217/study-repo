@@ -65,16 +65,21 @@ public class ProfileMatcherTest {
 
   @Before
   public void createMatchListener() {
+    // (1) 모키토의 정적 mock()메서드를 사용하여 MatchListener 목 인스턴스 생성
     listener = mock(MatchListener.class);
   }
 
   @Test
   public void processNotifiesListenerOnMatch() {
+    // (2) 매칭되는 프로파일(주어진 조건에 매칭될 것으로 기대되는 프로파일)을 matcher변수에 추가
     matcher.add(matchingProfile);
+    // (3) 주어진 조건 집합에 매칭되는 프로파일에 대한 MatchSet 객체를 요청
     MatchSet set = matchingProfile.getMatchSet(criteria);
 
+    // (4) 목 리스너와 MatchSet객체를 넘겨 matccher 변수에 매칭 처리를 지시
     matcher.process(listener, set);
 
+    // (5) 모키토를 활용하여 foundMatch메서드가 호출되었는지 확인
     verify(listener).foundMatch(matchingProfile, set);
   }
 
