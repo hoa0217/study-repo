@@ -48,7 +48,7 @@
     - 스레드를 사용하는 테스트 코드는 느리다.
         - 동시성 문제가 없다는 것을 보장하면서 실행 시간의 범위를 확장해야하기 때문.
 - 멀티스레드 코드를 테스트하는 방법
-    - 스레드 통제와 어플리케이션 코드 사이의 중첩을 최소화하라.
+    - 스레드 통제와 어플리케이션 코드 사이의 중첩을 최소화하라.(이책에서 다룰 부분)
         - 스레드없이 다량의 어플리케이션 코드를 단위테스트 할 수 있도록 설계 변경하라.
         - 남은 작은 코드에 대해 스레드 집중 테스트를 작성하라.
     - 다른 사람의 작업을 믿어라.
@@ -100,6 +100,28 @@ List<MatchSet> collectMatchSets(Criteria criteria){
     .collect(Collectors.toList());
     return matchSets;
 }
+```
+- process 메서드에 대한 테스트 코드 작성
+```java
+  @Before
+  public void createMatchListener() {
+    // (1) 모키토의 정적 mock()메서드를 사용하여 MatchListener 목 인스턴스 생성
+    listener = mock(MatchListener.class);
+  }
+
+  @Test
+  public void processNotifiesListenerOnMatch() {
+    // (2) 매칭되는 프로파일(주어진 조건에 매칭될 것으로 기대되는 프로파일)을 matcher변수에 추가
+    matcher.add(matchingProfile);
+    // (3) 주어진 조건 집합에 매칭되는 프로파일에 대한 MatchSet 객체를 요청
+    MatchSet set = matchingProfile.getMatchSet(criteria);
+
+    // (4) 목 리스너와 MatchSet객체를 넘겨 matccher 변수에 매칭 처리를 지시
+    matcher.process(listener, set);
+
+    // (5) 모키토를 활용하여 foundMatch메서드가 호출되었는지 확인
+    verify(listener).foundMatch(matchingProfile, set);
+  }
 ```
 - 리팩토링2 (스레드 로직 테스트를 위한 재설계)
 ```java
