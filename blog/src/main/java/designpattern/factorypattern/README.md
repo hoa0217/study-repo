@@ -55,7 +55,12 @@ public class SimplePizzaFactory {
 - 생산자(Creator) 클래스 : PizzaStore
 - 제품(Product) 클래스 : Pizza
 
-<img src="factorymethodpattern/Package%20factorymethodpattern.png" width="80%">
+<img src="factorymethodpattern/Package%20factorymethodpattern.png" width="100%">
+
+#### 병렬 클래스 계층 구조
+- 생산자 클래스와 거기에 대응되는 제품 클래스는 병렬 계층구조로 볼 수 있다.
+- 클래스 다이어그램을 보면, 둘다 추상클래스로 시작해 그 클래스를 확장하는 구상클래스들을 가지고 있다.
+  - 구체적인 구현은 구상클래스들이 책임지고 있다.
 
 #### 예시코드
 ```java
@@ -78,7 +83,7 @@ public abstract class PizzaStore {
 }
 ```
 > 팩토리 메서드를 추상메서드로 선언하여 서브클래스가 객체 생성을 책임지도록한다.   
-> 팩토리 메서드는 클라이언트(`orderPizza()`)에서 실제로 생성되는 구상객체가 무엇인지 알 수 없다.
+> 팩토리 메서드는 클라이언트(`orderPizza(String type)`)에서 실제로 생성되는 구상객체가 무엇인지 알 수 없다.
 ```java
 public class NYStylePizzaStore extends PizzaStore{
 
@@ -104,8 +109,3 @@ public class NYStylePizzaStore extends PizzaStore{
 PizzaStore pizzaStore = new NYStylePizzaStore();
 Pizza pizza = pizzaStore.orderPizza("cheese");
 ```
-#### 병렬 클래스 계층 구조
-- 생산자 클래스와 거기에 대응되는 제품 클래스는 병렬 계층구조로 볼 수 있다.
-- 클래스 다이어그램을 보면, 둘다 추상클래스로 시작해 그 클래스를 확장하는 구상클래스들을 가지고 있다.
-  - 구체적인 구현은 구상클래스들이 책임지고 있다.
-> 특히 생산자 클래스의 팩토리 메서드는 제품 생성을 캡슐화 하고 있다.
