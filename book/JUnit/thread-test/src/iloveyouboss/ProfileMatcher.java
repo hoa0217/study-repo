@@ -8,10 +8,13 @@
  ***/
 package iloveyouboss;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 public class ProfileMatcher {
   private Map<String, Profile> profiles = new HashMap<>();
