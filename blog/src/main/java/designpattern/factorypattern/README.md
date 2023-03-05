@@ -44,3 +44,68 @@ public class SimplePizzaFactory {
   }
 }
 ```
+> 각 피자는 Pizza인터페이스를 구현해야하며, 구상클래스여야한다.
+---
+### Factory Method Pattern
+- 객체를 생성할 때 필요한 인터페이스를 만든다. 
+- 어떤 클래스의 인스턴스를 만들지는 서브클래스에서 결정한다.
+- 팩토리 메서드 패턴을 사용하면 클래스 인스턴스 만드는 일을 서브클래스에게 맡기게 된다.
+  - 사용하는 서브클래스에 따라 생산되는 객체 인스턴스가 결정됨으로써 객체 생성을 캡슐화한다.
+  - 즉, 생산자클래스가 실제 생산될 제품을 전혀 모르는 상태로 만들어진다.
+- 생산자(Creator) 클래스 : PizzaStore
+- 제품(Product) 클래스 : Pizza
+
+<img src="factorymethodpattern/Package%20factorymethodpattern.png" width="80%">
+
+#### 예시코드
+```java
+public abstract class PizzaStore {
+
+  final Pizza orderPizza(String type){
+    Pizza pizza;
+
+    pizza = createPizza(type);
+
+    pizza.prepare();
+    pizza.bake();
+    pizza.cut();
+    pizza.box();
+
+    return pizza;
+  }
+  
+  protected abstract Pizza createPizza(String type);
+}
+```
+> 팩토리 메서드를 추상메서드로 선언하여 서브클래스가 객체 생성을 책임지도록한다.   
+> 팩토리 메서드는 클라이언트(`orderPizza()`)에서 실제로 생성되는 구상객체가 무엇인지 알 수 없다.
+```java
+public class NYStylePizzaStore extends PizzaStore{
+
+  @Override
+  protected Pizza createPizza(String type) {
+
+    Pizza pizza = null;
+    if (type.equals("cheese")) {
+      pizza = new NYStyleCheesPizza();
+    } else if (type.equals("pepperoni")) {
+      pizza = new NYStylePepperoniPizza();
+    } else if (type.equals("clam")) {
+      pizza = new NYStyleClamPizza();
+    } else if (type.equals("veggie")) {
+      pizza = new NYStyleVeggiePizza();
+    }
+
+    return pizza;
+  }
+}
+```
+```java
+PizzaStore pizzaStore = new NYStylePizzaStore();
+Pizza pizza = pizzaStore.orderPizza("cheese");
+```
+#### 병렬 클래스 계층 구조
+- 생산자 클래스와 거기에 대응되는 제품 클래스는 병렬 계층구조로 볼 수 있다.
+- 클래스 다이어그램을 보면, 둘다 추상클래스로 시작해 그 클래스를 확장하는 구상클래스들을 가지고 있다.
+  - 구체적인 구현은 구상클래스들이 책임지고 있다.
+> 특히 생산자 클래스의 팩토리 메서드는 제품 생성을 캡슐화 하고 있다.
