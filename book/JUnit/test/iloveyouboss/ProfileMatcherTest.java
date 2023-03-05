@@ -11,11 +11,11 @@ package iloveyouboss;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 import java.util.*;
+import java.util.function.*;
 import java.util.stream.*;
 import org.junit.*;
 // ...
 import static org.mockito.Mockito.*;
-
 public class ProfileMatcherTest {
   // ...
   private BooleanQuestion question;
@@ -65,21 +65,16 @@ public class ProfileMatcherTest {
 
   @Before
   public void createMatchListener() {
-    // (1) 모키토의 정적 mock()메서드를 사용하여 MatchListener 목 인스턴스 생성
     listener = mock(MatchListener.class);
   }
 
   @Test
   public void processNotifiesListenerOnMatch() {
-    // (2) 매칭되는 프로파일(주어진 조건에 매칭될 것으로 기대되는 프로파일)을 matcher변수에 추가
     matcher.add(matchingProfile);
-    // (3) 주어진 조건 집합에 매칭되는 프로파일에 대한 MatchSet 객체를 요청
     MatchSet set = matchingProfile.getMatchSet(criteria);
 
-    // (4) 목 리스너와 MatchSet객체를 넘겨 matccher 변수에 매칭 처리를 지시
     matcher.process(listener, set);
 
-    // (5) 모키토를 활용하여 foundMatch메서드가 호출되었는지 확인
     verify(listener).foundMatch(matchingProfile, set);
   }
 
@@ -92,7 +87,38 @@ public class ProfileMatcherTest {
 
     verify(listener, never()).foundMatch(nonMatchingProfile, set);
   }
-  // ...
+
+  @Test
+  public void gathersMatchingProfiles() {
+
+    // (1) 리스너가 수신하는 MatchSet 객체들의 프로파일 ID목록을 저장할 문자열 Set객체를 생성
+    Set<String> processedSets =
+        Collections.synchronizedSet(new HashSet<>());
+    BiConsumer<MatchListener, MatchSet> processFunction =
+        // (2) processFunction()함수를 정의 (프로덕션 코드를 대신 한다.)
+        (listener, set) -> {
+          // (3) 리스너에 대한 각 콜백에서 MatchSet 객체의 프로파일 ID를 processedSets에 추가
+          processedSets.add(set.getProfileId());
+        };
+    // (4) 도우미 메서드를 사용하여 테스트옹 MatchSet객체들을 생성한다.
+    List<MatchSet> matchSets = createMatchSets(100);
+
+    // (5) 인수로 함수를 갖는 findMatchingProfiles()메서드를 호출하고 구현한 processFunction을 넘긴다.
+    matcher.findMatchingProfiles(criteria, listener, matchSets, processFunction);
+
+    // (6) 모든 스레드의 실행이 완료될 때 까지 반복문을 실행한다.
+    while (!matcher.getExecutor().isTerminated()){}
+    // (7) processedSets과 matchSet객체의 ID와 매칭되는지 검증한다.
+    assertThat(processedSets, equalTo(matchSets.stream()
+        .map(MatchSet::getProfileId).collect(Collectors.toSet())));
+  }
+
+  private List<MatchSet> createMatchSets(int count) {
+    List<MatchSet> sets = new ArrayList<>();
+    for (int i = 0; i < count; i++)
+      sets.add(new MatchSet(String.valueOf(i), null, null));
+    return sets;
+  }
 
   private Answer matchingAnswer() {
     return new Answer(question, Bool.TRUE);

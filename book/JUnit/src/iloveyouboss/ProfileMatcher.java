@@ -10,6 +10,7 @@ package iloveyouboss;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.*;
 import java.util.stream.*;
 
 public class ProfileMatcher {
@@ -20,16 +21,29 @@ public class ProfileMatcher {
     profiles.put(profile.getId(), profile);
   }
 
-  public void findMatchingProfiles(
-      Criteria criteria, MatchListener listener) {
-    ExecutorService executor =
-        Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
+  private ExecutorService executor =
+      Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
 
-    for (MatchSet set: collectMatchSets(criteria)) {
-      Runnable runnable = () -> process(listener, set);
+  ExecutorService getExecutor() {
+    return executor;
+  }
+
+  public void findMatchingProfiles(
+      Criteria criteria,
+      MatchListener listener,
+      List<MatchSet> matchSets,
+      BiConsumer<MatchListener, MatchSet> processFunction) {
+    for (MatchSet set: matchSets) {
+      Runnable runnable = () -> processFunction.accept(listener, set);
       executor.execute(runnable);
     }
     executor.shutdown();
+  }
+
+  public void findMatchingProfiles(
+      Criteria criteria, MatchListener listener) {
+    findMatchingProfiles(
+        criteria, listener, collectMatchSets(criteria), this::process);
   }
 
   void process(MatchListener listener, MatchSet set) {

@@ -40,15 +40,14 @@
 
 ---
 
-### 까다로운 테스트
-
+### 멀티스레드 코드 테스트
 - 멀티스레드 코드 테스트
     - 동시성 처리가 필요한 어플리케이션 코드를 테스트하는 것은 단위테스트의 영역이 아니다.
         - 통합테스트로 분류하는 것이 낫다.
     - 스레드를 사용하는 테스트 코드는 느리다.
         - 동시성 문제가 없다는 것을 보장하면서 실행 시간의 범위를 확장해야하기 때문.
 - 멀티스레드 코드를 테스트하는 방법
-    - 스레드 통제와 어플리케이션 코드 사이의 중첩을 최소화하라.(이책에서 다룰 부분)
+    - 스레드 통제와 어플리케이션 코드 사이의 중첩을 최소화하라. (이책에서 다룬 부분)
         - 스레드없이 다량의 어플리케이션 코드를 단위테스트 할 수 있도록 설계 변경하라.
         - 남은 작은 코드에 대해 스레드 집중 테스트를 작성하라.
     - 다른 사람의 작업을 믿어라.
@@ -155,3 +154,36 @@ List<MatchSet> collectMatchSets(Criteria criteria) {
   return matchSets;
 }
 ```
+> 이미 검증된 process메서드를 BiConsumer인터페이스로 참조하여 MatchSet을 처리하는 로직을 호출하는 방식
+- 스레드 로직을 위한 테스트 작성
+```java
+  @Test
+  public void gathersMatchingProfiles() {
+
+    // (1) 리스너가 수신하는 MatchSet 객체들의 프로파일 ID목록을 저장할 문자열 Set객체를 생성
+    Set<String> processedSets =
+        Collections.synchronizedSet(new HashSet<>());
+    BiConsumer<MatchListener, MatchSet> processFunction =
+        // (2) processFunction()함수를 정의 (프로덕션 코드를 대신 한다.)
+        (listener, set) -> {
+          // (3) 리스너에 대한 각 콜백에서 MatchSet 객체의 프로파일 ID를 processedSets에 추가
+          processedSets.add(set.getProfileId());
+        };
+    // (4) 도우미 메서드를 사용하여 테스트옹 MatchSet객체들을 생성한다.
+    List<MatchSet> matchSets = createMatchSets(100);
+
+    // (5) 인수로 함수를 갖는 findMatchingProfiles()메서드를 호출하고 구현한 processFunction을 넘긴다.
+    matcher.findMatchingProfiles(criteria, listener, matchSets, processFunction);
+
+    // (6) 모든 스레드의 실행이 완료될 때 까지 반복문을 실행한다.
+    while (!matcher.getExecutor().isTerminated()){}
+    // (7) processedSets과 matchSet객체의 ID와 매칭되는지 검증한다.
+    assertThat(processedSets, equalTo(matchSets.stream()
+        .map(MatchSet::getProfileId).collect(Collectors.toSet())));
+  }
+```
+> 애플리케이션 로직과 스레드 로직의 관심사를 분리하여 상당히 짧은 순서로 테스트를 작성하였다.     
+> 특히 스레드 중심 테스트를 처리하는데 도움이 되는 유틸리티 메서드들을 만들면서 스레드 관련 테스트도 쉬워졌다.
+---
+### 데이터베이스 테스트
+- 자바 영속성 API(JPA)를 사용하여 데이터베이스와 통신하는 Controller변수를 활용한 테스트를 작성해야한다.
