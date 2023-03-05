@@ -8,7 +8,10 @@
  ***/
 package iloveyouboss;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 public class Criteria implements Iterable<Criterion> {
   private List<Criterion> criteria = new ArrayList<>();

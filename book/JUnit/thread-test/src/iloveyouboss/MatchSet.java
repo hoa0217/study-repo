@@ -8,7 +8,7 @@
  ***/
 package iloveyouboss;
 
-import java.util.*;
+import java.util.Map;
 
 public class MatchSet implements Comparable<MatchSet> {
   private Map<String, Answer> answers;
