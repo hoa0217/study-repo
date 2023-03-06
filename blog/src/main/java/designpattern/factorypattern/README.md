@@ -52,6 +52,10 @@ public class SimplePizzaFactory {
 - 팩토리 메서드 패턴을 사용하면 클래스 인스턴스 만드는 일을 서브클래스에게 맡기게 된다.
   - 사용하는 서브클래스에 따라 생산되는 객체 인스턴스가 결정됨으로써 객체 생성을 캡슐화한다.
   - 즉, 생산자클래스가 실제 생산될 제품을 전혀 모르는 상태로 만들어진다.
+  
+<img src="factorymethodpattern/factory-method.png" width="100%">
+
+> 실제 구상 클래스 인스턴스를 만드는 일은 ConcreteCreator가 책임진다. 실제 제품을 만드는 방법을 알고 있는 클래스는 ConcreteCreator뿐이다.
 - 생산자(Creator) 클래스 : PizzaStore
 - 제품(Product) 클래스 : Pizza
 
@@ -83,7 +87,7 @@ public abstract class PizzaStore {
 }
 ```
 > 팩토리 메서드를 추상메서드로 선언하여 서브클래스가 객체 생성을 책임지도록한다.   
-> 팩토리 메서드는 클라이언트(`orderPizza(String type)`)에서 실제로 생성되는 구상객체가 무엇인지 알 수 없다.
+> 팩토리 메서드 패턴을 사용하면 클라이언트(`orderPizza(String type)`)에서 실제로 생성되는 구상객체가 무엇인지 알 수 없다.
 ```java
 public class NYStylePizzaStore extends PizzaStore{
 
@@ -108,4 +112,194 @@ public class NYStylePizzaStore extends PizzaStore{
 ```java
 PizzaStore pizzaStore = new NYStylePizzaStore();
 Pizza pizza = pizzaStore.orderPizza("cheese");
+```
+---
+### SimpleFactory vs Factory Method Pattern
+- 이 둘은 상당 부분 비슷하다.
+- 하지만 SimpleFactory의 경우 일회용 처방에 불과한 반면 Factory Method Pattern은 여러번 재사용이 가능한 프레임워크를 만들 수 있다.
+- 만약 다른 제품을 추가하거나 제품 구성을 변경하더라도 Creator 클래스가 ConcreteProduct와 느슨하게 결합되어 있기 때문에 Creator는 건드릴 필요가 없다.
+  - Creator <- ConcreteCreator -> ConcreteProduct
+---
+### 의존성 뒤집기 원칙(Dependency Inversion Principle)
+- 구상 클래스에 의존하지 않고 **추상화** 된것에 의존하게 만든다.
+- 고수준 구성 요소가 저수준 구성 요소를 의존하면 안된다.
+- PizzaStore(고수준) -> Pizza구상클래스(저수준)에 DIP를 적용하면?
+  - PizzaStore -> Pizza추상클래스 <- Pizza구상클래스
+  > 고수준모듈, 저수준모듈 둘 다 하나의 **추상클래스**에 의존한다.
+- Pizza라는 클래스로 추상화했으니, 구상 클래스를 없애는 팩토리를 사용해보자.
+
+#### 의존성 뒤집기 원칙을 지키는 방법
+1. 변수에 구상 클래스의 레퍼런스를 저장하지 않기.
+  - new 연산자를 사용하지 않고 팩토리 메서드를 쓰자.
+2. 구상 클래스에서 유도된 클래스를 만들지 않기.
+  - 인터페이스나 추상 클래스로부터 클래스를 만들자.
+  > ConcreteCreator로부터 클래스 만들지 말라는 말일까?..(질문하기)
+3. 추상 클래스에 이미 구현되어 있는 메서드를 오버라이드 하지 않기.
+  - 추상 클래스에 구현되어 있는 메서드를 오버라이드 하면 제대로 추상화 되지 않는다.
+  - 구현 메서드는 _모든 서브 클래스에서 공유할 수 있는 것_ 만 정의하자.
+---
+### Abstract Factory Pattern
+- 구상클래스에 의존하지 않고도 서로 연관되거나 의존적인 객체로 이루어진 제품군을 생산하는 인터페이스를 제공한다.
+  - 구상 클래스는 서브클래스에서 만든다.
+- 추상 팩토리 패턴을 사용하면 추상 인터페이스로 제품을 공급받을 수 있다.
+- 클라이언트는 실제로 어떤 제품이 생산되는지 전혀 알 필요가 없다.
+- 클라이언트와 팩토리에서 생산되는 제품을 분리할 수 있다.
+
+<img src="abstractfactorypattern/abstract-factory-pattern.png" width="100%">
+
+> - Abstract Factory: Concrete Factory의 인터페이스. 
+> - Concrete Factory: 특정 종류의 제품을 생성하기 위해 Abstract Factory 인터페이스를 구현한다.
+> - Abstract Product: Abstract Factory가 생성하는 제품이 구현하고 있는 인터페이스.
+> - Concrete Product: 팩토리가 실제로 생성하는 제품.
+> - Client: 인터페이스만을 이용해서 제품을 생산한다.
+
+<img src="abstractfactorypattern/Package%20abstractfactorypattern.png" width="100%">
+
+#### 예시코드
+```java
+public abstract class PizzaStore {
+
+  public final Pizza orderPizza(String type){
+    Pizza pizza;
+
+    pizza = createPizza(type);
+
+    pizza.prepare();
+    pizza.bake();
+    pizza.cut();
+    pizza.box();
+
+    return pizza;
+  }
+
+  protected abstract Pizza createPizza(String type);
+}
+
+public class NYPizzaStore extends PizzaStore {
+
+  @Override
+  protected Pizza createPizza(String item) {
+    Pizza pizza = null;
+    PizzaIngredientFactory ingredientFactory = new NYPizzaIngredientFactory();
+
+    if(item.equals("cheese")){
+      pizza = new ChessPizza(ingredientFactory);
+      pizza.setName("뉴욕 스타일 치즈 피자");
+    }else if(item.equals("veggie")){
+      pizza = new VeggiePizza(ingredientFactory);
+      pizza.setName("뉴욕 스타일 야채 피자");
+    }else if(item.equals("clam")){
+      pizza = new ClamPizza(ingredientFactory);
+      pizza.setName("뉴욕 스타일 조개 피자");
+    }else if(item.equals("pepperoni")){
+      pizza = new PepperoniPizza(ingredientFactory);
+      pizza.setName("뉴욕 스타일 페퍼로니 피자");
+    }
+
+    return pizza;
+  }
+}
+```
+```java
+public abstract class Pizza {
+
+  protected String name;
+  protected Dough dough;
+  protected Sauce sauce;
+  protected Veggies[] veggies;
+  protected Cheese cheese;
+  protected Pepperoni pepperoni;
+  protected Clams clams;
+
+  public abstract void prepare();
+
+  public void bake(){
+    System.out.println("175도에서 25분 간 굽기");
+  }
+
+  public void cut(){
+    System.out.println("피자를 사선으로 자르기");
+  }
+
+  public void box(){
+    System.out.println("상자에 피자 담기");
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+}
+
+public class ChessPizza extends Pizza {
+
+  PizzaIngredientFactory ingredientFactory;
+
+  public ChessPizza(
+          PizzaIngredientFactory ingredientFactory) {
+    this.ingredientFactory = ingredientFactory;
+  }
+
+  @Override
+  public void prepare() {
+    System.out.println("준비 중: "+name);
+    dough = ingredientFactory.createDough();
+    sauce = ingredientFactory.createSauce();
+    cheese = ingredientFactory.createCheese();
+  }
+}
+```
+```java
+public interface PizzaIngredientFactory {
+
+  public Dough createDough();
+  public Sauce createSauce();
+  public Cheese createCheese();
+  public Veggies[] createVeggies();
+  public Pepperoni CreatePepperoni();
+  public Clams createClam();
+
+}
+
+public class NYPizzaIngredientFactory implements PizzaIngredientFactory {
+
+  @Override
+  public Dough createDough() {
+    System.out.println("Thin도우를 돌리는 중...");
+    return new ThinCrustDough();
+  }
+
+  @Override
+  public Sauce createSauce() {
+    System.out.println("Marinara소스를 뿌리는 중...");
+    return new MarinaraSauce();
+  }
+
+  @Override
+  public Cheese createCheese() {
+    System.out.println("Reggiano치즈를 올리는 중...");
+    return new ReggianoCheese();
+  }
+
+  @Override
+  public Veggies[] createVeggies() {
+    Veggies[] veggies = {new Garlic(), new Onion(), new Mushroom(), new RedPepper()};
+    return veggies;
+  }
+
+  @Override
+  public Pepperoni CreatePepperoni() {
+    System.out.println("Sliced페퍼로니를 올리는 중...");
+    return new SlicedPepperoni();
+  }
+
+  @Override
+  public Clams createClam() {
+    System.out.println("Fresh조개를 올리는 중...");
+    return new FreshClams();
+  }
+}
 ```

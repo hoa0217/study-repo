@@ -1,16 +1,16 @@
-package designpattern.factorypattern.factorymethodpattern;
+package designpattern.factorypattern.factorymethodpattern.pizza;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Pizza {
 
-  String name;
-  String dough;
-  String sauce;
-  List<String> toppings = new ArrayList<>();
+  protected String name;
+  protected String dough;
+  protected String sauce;
+  protected List<String> toppings = new ArrayList<>();
 
-  void prepare() {
+  public void prepare() {
     System.out.println("준비 중: " + name);
     System.out.println("도우를 돌리는 중...");
     System.out.println("소스를 뿌리는 중...");
@@ -20,15 +20,15 @@ public abstract class Pizza {
     }
   }
 
-  void bake(){
+  public void bake(){
     System.out.println("175도에서 25분 간 굽기");
   }
 
-  void cut(){
+  public void cut(){
     System.out.println("피자를 사선으로 자르기");
   }
 
-  void box(){
+  public void box(){
     System.out.println("상자에 피자 담기");
   }
 

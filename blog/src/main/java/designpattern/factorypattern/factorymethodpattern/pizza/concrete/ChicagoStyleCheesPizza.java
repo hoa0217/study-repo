@@ -1,6 +1,8 @@
-package designpattern.factorypattern.factorymethodpattern;
+package designpattern.factorypattern.factorymethodpattern.pizza.concrete;
 
-public class ChicagoStyleCheesPizza extends Pizza{
+import designpattern.factorypattern.factorymethodpattern.pizza.Pizza;
+
+public class ChicagoStyleCheesPizza extends Pizza {
 
   public ChicagoStyleCheesPizza() {
     name = "시카고 스타일 딥 디쉬 치즈 피자";
@@ -11,7 +13,7 @@ public class ChicagoStyleCheesPizza extends Pizza{
   }
 
   @Override
-  void cut() {
+  public void cut() {
     System.out.println("네모난 모양으로 피자 자르기");
   }
 }

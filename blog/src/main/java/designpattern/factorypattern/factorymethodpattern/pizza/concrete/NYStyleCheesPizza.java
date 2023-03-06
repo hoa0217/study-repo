@@ -1,6 +1,8 @@
-package designpattern.factorypattern.factorymethodpattern;
+package designpattern.factorypattern.factorymethodpattern.pizza.concrete;
 
-public class NYStyleCheesPizza extends Pizza{
+import designpattern.factorypattern.factorymethodpattern.pizza.Pizza;
+
+public class NYStyleCheesPizza extends Pizza {
 
   public NYStyleCheesPizza() {
     name = "뉴욕 스타일 소스와 치즈 피자";
