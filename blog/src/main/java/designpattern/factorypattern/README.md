@@ -168,11 +168,11 @@ Pizza pizza = pizzaStore.orderPizza("cheese");
 
 <img src="abstractfactorypattern/abstract-factory-pattern.png" width="100%">
 
-> - Abstract Factory: Concrete Factory의 인터페이스. 
-> - Concrete Factory: 특정 종류의 제품을 생성하기 위해 Abstract Factory 인터페이스를 구현한다.
-> - Abstract Product: Abstract Factory가 생성하는 제품이 구현하고 있는 인터페이스.
-> - Concrete Product: 팩토리가 실제로 생성하는 제품.
-> - Client: 인터페이스만을 이용해서 제품을 생산한다.
+> - Abstract Factory: Concrete Factory의 인터페이스. (`PizzaIngredientFactory`) 
+> - Concrete Factory: 특정 종류의 제품을 생성하기 위해 Abstract Factory 인터페이스를 구현한다. (`NYPizzaIngredientFactory`)
+> - Abstract Product: Abstract Factory가 생성하는 제품이 구현하고 있는 인터페이스. (`Dough`, `Sauce` 등)
+> - Concrete Product: 팩토리가 실제로 생성하는 제품. (`ThinCrustDough`, `MarinaraSauce` 등)
+> - Client: 인터페이스만을 이용해서 제품을 생산한다. (`CheesPizza`)
 
 <img src="abstractfactorypattern/Package%20abstractfactorypattern.png" width="100%">
 
@@ -203,39 +203,21 @@ public class NYPizzaStore extends PizzaStore {
   }
 }
 ```
-> PizzaIngredientFactory 각 Pizza구현클래스에 주입하는 방식으로, 피자 종류에 맞는 재료를 생산하도록 구축했다.
+> PizzaIngredientFactory를 각 Pizza구현클래스에 주입하는 방식으로, 피자 종류에 맞는 재료를 생산하도록 구축했다.
 ```java
 public abstract class Pizza {
 
   protected String name;
   protected Dough dough;
   protected Sauce sauce;
-  protected Veggies[] veggies;
   protected Cheese cheese;
-  protected Pepperoni pepperoni;
-  protected Clams clams;
 
   public abstract void prepare();
-
-  public void bake(){
-    System.out.println("175도에서 25분 간 굽기");
-  }
-
-  public void cut(){
-    System.out.println("피자를 사선으로 자르기");
-  }
-
-  public void box(){
-    System.out.println("상자에 피자 담기");
-  }
 
   public void setName(String name) {
     this.name = name;
   }
-
-  public String getName() {
-    return name;
-  }
+  ...
 }
 
 public class ChessPizza extends Pizza {
@@ -256,7 +238,7 @@ public class ChessPizza extends Pizza {
   }
 }
 ```
-> PizzaIngredientFactory 인터페이스를 사용하여 코드와 제품(재료)를 생산하는 팩토리를 분리하였다.
+> PizzaIngredientFactory 인터페이스를 사용하여 Client(피자)코드와 제품(재료)를 생산하는 팩토리를 분리하였다.
 > 만약 다른 제품(재료)이 필요하면 다른 팩토리를 사용하면된다. (ChicagoIngredientFactory 주입)
 ```java
 public interface PizzaIngredientFactory {
@@ -264,9 +246,7 @@ public interface PizzaIngredientFactory {
   public Dough createDough();
   public Sauce createSauce();
   public Cheese createCheese();
-  public Veggies[] createVeggies();
-  public Pepperoni CreatePepperoni();
-  public Clams createClam();
+  ...
 
 }
 
@@ -290,22 +270,6 @@ public class NYPizzaIngredientFactory implements PizzaIngredientFactory {
     return new ReggianoCheese();
   }
 
-  @Override
-  public Veggies[] createVeggies() {
-    Veggies[] veggies = {new Garlic(), new Onion(), new Mushroom(), new RedPepper()};
-    return veggies;
-  }
-
-  @Override
-  public Pepperoni CreatePepperoni() {
-    System.out.println("Sliced페퍼로니를 올리는 중...");
-    return new SlicedPepperoni();
-  }
-
-  @Override
-  public Clams createClam() {
-    System.out.println("Fresh조개를 올리는 중...");
-    return new FreshClams();
-  }
+  ...
 }
 ```
