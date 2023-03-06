@@ -27,6 +27,29 @@ else if(hunting) duck = new DecoyDuck();
 - Pizza의 종류는 여러가지가 있으며 종류는 계속 바뀐다.
 > 계속 변경되는 객체 생성부분을 캡슐화하여, 객체 생성 팩토리를 만들자.
 ```java
+public class PizzaStore {
+
+  SimplePizzaFactory factory;
+
+  public PizzaStore(SimplePizzaFactory factory) {
+    this.factory = factory;
+  }
+
+  Pizza orderPizza(String type){
+    // new 연산자 대신, 팩토리 객체의 create메서드 사용. 
+    // 더이상 구상 클래스의 인스턴스를 만들지 않아도됨.
+    Pizza pizza = factory.createPizza(type);
+
+    pizza.prepare();
+    pizza.bake();
+    pizza.cut();
+    pizza.box();
+
+    return pizza;
+  }
+}
+```
+```java
 public class SimplePizzaFactory {
 
   public Pizza createPizza(String type) {
@@ -44,7 +67,6 @@ public class SimplePizzaFactory {
   }
 }
 ```
-> 각 피자는 Pizza인터페이스를 구현해야하며, 구상클래스여야한다.
 ---
 ### Factory Method Pattern
 - 객체를 생성할 때 필요한 인터페이스를 만든다. 
@@ -82,11 +104,10 @@ public abstract class PizzaStore {
 
     return pizza;
   }
-  
+  // 팩토리 메서드를 추상메서드로 선언하여 서브클래스가 객체 생성을 책임지도록한다.
   protected abstract Pizza createPizza(String type);
 }
-```
-> 팩토리 메서드를 추상메서드로 선언하여 서브클래스가 객체 생성을 책임지도록한다.   
+``` 
 > 팩토리 메서드 패턴을 사용하면 클라이언트(`orderPizza(String type)`)에서 실제로 생성되는 구상객체가 무엇인지 알 수 없다.
 ```java
 public class NYStylePizzaStore extends PizzaStore{
@@ -157,24 +178,6 @@ Pizza pizza = pizzaStore.orderPizza("cheese");
 
 #### 예시코드
 ```java
-public abstract class PizzaStore {
-
-  public final Pizza orderPizza(String type){
-    Pizza pizza;
-
-    pizza = createPizza(type);
-
-    pizza.prepare();
-    pizza.bake();
-    pizza.cut();
-    pizza.box();
-
-    return pizza;
-  }
-
-  protected abstract Pizza createPizza(String type);
-}
-
 public class NYPizzaStore extends PizzaStore {
 
   @Override
@@ -200,6 +203,7 @@ public class NYPizzaStore extends PizzaStore {
   }
 }
 ```
+> PizzaIngredientFactory 각 Pizza구현클래스에 주입하는 방식으로, 피자 종류에 맞는 재료를 생산하도록 구축했다.
 ```java
 public abstract class Pizza {
 
@@ -252,6 +256,8 @@ public class ChessPizza extends Pizza {
   }
 }
 ```
+> PizzaIngredientFactory 인터페이스를 사용하여 코드와 제품(재료)를 생산하는 팩토리를 분리하였다.
+> 만약 다른 제품(재료)이 필요하면 다른 팩토리를 사용하면된다. (ChicagoIngredientFactory 주입)
 ```java
 public interface PizzaIngredientFactory {
 
