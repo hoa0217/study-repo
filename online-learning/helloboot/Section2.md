@@ -12,17 +12,17 @@
     2. `source "$HOME/.sdkman/bin/sdkman-init.sh"`
     3. `sdk version`
     
-        <img src="img/Section2/1.14.14.png">
+        <img src="img/Section2/1.14.14.png" size="80%">
     
     [Installation - SDKMAN! the Software Development Kit Manager](https://sdkman.io/install)
     
 - `sdk list java` : java 전체 목록 확인
 
-    <img src="img/Section2/1.16.23.png">
+    <img src="img/Section2/1.16.23.png" size="80%">
   
 - `sdk install java 11.0.17-amzn` : 특정 버전 java 설치
 
-   <img src="img/Section2/1.18.24.png">
+   <img src="img/Section2/1.18.24.png" size="80%">
 
 > 만약 특정 프로젝트에 특정 java버전을 사용하고싶다면 ? 
 프로젝트 폴더 들어가서 `java use java [jdk 버전]`
@@ -36,16 +36,16 @@
 
 - `sdk install springboot 2.7.6`   : Spring Boot CLI 설치
 
-   <img src="img/Section2/1.26.07.png">
+   <img src="img/Section2/1.26.07.png" size="80%">
   
 - cli로 간단한 프로젝트 생성 및 구동하기
     - `vi hello.groovy` 생성
     
-        <img src="img/Section2/1.30.38.png">        
+        <img src="img/Section2/1.30.38.png" size="80%">        
 
     - `spring run hello.groovy`
     
-       <img src="img/Section2/1.32.11.png">
+       <img src="img/Section2/1.32.11.png" size="80%">
 
 ---
 
@@ -54,7 +54,7 @@
 - 웹 Spring Initializr - [https://start.spring.io/](https://start.spring.io/)
 - IDE - New Project - Spring Initailizr
 
-    <img src="img/Section2/1.08.17.png">
+    <img src="img/Section2/1.08.17.png" size="80%">
   
 - **Spring Boot CLI**
 1. `spring shell`
@@ -68,7 +68,7 @@
 3. `cd helloboot`
 4. `./gradlew bootRun`
 
-   <img src="img/Section2/2.08.16.png">
+   <img src="img/Section2/2.08.16.png" size="80%">
 
 > `control` + `c` 로 종료
 > 
@@ -149,7 +149,7 @@ HTTP 요청을 만들고 응답을 확인하는데 사용되는 도구
 
 - `http -v ":8080/hello?name=Spring”`
 
-   <img src="img/Section2/2.35.03.png">
+   <img src="img/Section2/2.35.03.png" size="80%">
   
 - 전달된 request
     - Request Line
@@ -168,7 +168,7 @@ HTTP 요청을 만들고 응답을 확인하는데 사용되는 도구
 
 [ 복습 ]
 
-<img src="img/Section2/2.40.04.png">
+<img src="img/Section2/2.40.04.png" size="80%">
 
 - 웹 클라이언트는 웹컨테이너에 요청을 보낸다.
 - 웹컨테이너는 이를 처리할 웹컴포넌트를 찾아 요청을 위임한다.
