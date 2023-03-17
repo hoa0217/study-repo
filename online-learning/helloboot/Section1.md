@@ -38,7 +38,7 @@
 
 - 이 이슈를 받아들여 framework를 만들기보다 boot라는 새로운 프로젝트로 개발 시작
 
-<img src="img/Section1/3.51.17.png"/>
+<img src="img/Section1/3.51.17.png" width="80%">
 
 ---
 
@@ -50,7 +50,7 @@
 - 그렇다면 Container가 무엇인가?
     - WebContainer
       
-       <img src="img/Section1/3.58.44.png"/>
+       <img src="img/Section1/3.58.44.png" width="80%">
       
         - 웹컴포넌트를 관리 (웹컴포넌트를 메모리에 올리고 동작하도록 life cycle관리)
             - 하나가 아닌 여러 개의 웹컴포넌트들을 관리한다.
@@ -58,13 +58,13 @@
             - 웹컴포넌트를 선택하는 작업 : 라우팅, 매핑(handler mapping)
 - 이를 자바용어로 바꿔보자
 
-    <img src="img/Section1/5.24.18.png"/>
+    <img src="img/Section1/5.24.18.png" width="80%">
   
     - 유명한 Servlet Container : 톰캣
     - 서블릿들을 여러개띄워놓고 mapping정보를 넣으면 요청에 따라 특정 서블릿이 요청을 처리하고 응답을 생성하여 돌려주는 서블릿 컨테이너가 존재한다.
 - 하지만 너무 제한적이다. 좀더 나은방법으로 개발을 하고싶다 → **스프링프레임워크**
 
-    <img src="img/Section1/5.30.45.png"/>
+    <img src="img/Section1/5.30.45.png" width="80%">
   
     - 스프링도 컨테이너다. Spring Container는 Servlet Container 뒤에존재한다.
     - 어떤 기능을 담당하는 컴포넌트 = Java Bean
@@ -80,7 +80,7 @@
 - 그래서 서블릿컨테이너가 없는 컨테이너리스 웹아키텍처를 만들었으면 좋겠다. → **스프링부트**
     - 서블릿컨테이너라는게 웹 어플리케이션에 필요 하지만, 이거를 설치하고 관리하는 데에 개발자가 시간을 들이고 지식을 학습하고 적용하는 수고를 제거함.
     
-       <img src="img/Section1/5.36.01.png"/>
+       <img src="img/Section1/5.36.01.png" width="80%">
       
     - 나중에 필요하면 서블릿컨테이너를 커스터마이징 할 수 있음.
         - 하지만 일단 몰라도됨.
@@ -157,4 +157,4 @@
 - 직접 만든 빈 구성 정보를 활용하고 그에 따른 변화를 분석할 수 있다.
 - 스프링 부트의 기술을 꼼꼼히 살펴볼 수 있다.
 
-<img src="img/Section1/6.02.08.png"/>
+<img src="img/Section1/6.02.08.png" width="80%">
