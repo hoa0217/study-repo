@@ -414,7 +414,7 @@ public class HelloServiceTest {
 💡 실제로 우리가 만드는 Spring Application이나 JPA등에서도 Proxy를 굉장히 많이 사용한다.
 
 </aside>
-
+<br>
 <aside>
 💡 DI가 가능한 구조로 설계해두면 위와같은 다양한 종류의 유연함을 코드에 제공해줄 수 있다.
 
