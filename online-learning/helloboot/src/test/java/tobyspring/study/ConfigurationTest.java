@@ -14,6 +14,7 @@ public class ConfigurationTest {
     Bean1 bean1 = myConfig.bean1();
     Bean2 bean2 = myConfig.bean2();
     Assertions.assertThat(bean1.common).isNotEqualTo(bean2.common);
+
   }
 
   @Test

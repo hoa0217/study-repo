@@ -169,10 +169,19 @@ Pizza pizza = pizzaStore.orderPizza("cheese");
 <img src="abstractfactorypattern/abstract-factory-pattern.png" width="100%">
 
 > - Abstract Factory: Concrete Factory의 인터페이스. (`PizzaIngredientFactory`) 
-> - Concrete Factory: 특정 종류의 제품을 생성하기 위해 Abstract Factory 인터페이스를 구현한다. (`NYPizzaIngredientFactory`)
-> - Abstract Product: Abstract Factory가 생성하는 제품이 구현하고 있는 인터페이스. (`Dough`, `Sauce` 등)
-> - Concrete Product: 팩토리가 실제로 생성하는 제품. (`ThinCrustDough`, `MarinaraSauce` 등)
-> - Client: 인터페이스만을 이용해서 제품을 생산한다. (`CheesPizza`)
+> - Concrete Factory: 특정 종류의 제품을 생성하기 위해 Abstract Factory 인터페이스를 구현한다. (`NYPizzaIngredientFactory`,`ChicagoPizzaIngredientFactory`)
+> - Abstract Product: Abstract Factory가 생성하는 제품이 구현하고 있는 인터페이스. (`Pizza`)
+> - Concrete Product: 팩토리가 실제로 생성하는 제품. (`ChessPizza`)
+> - Client: 인터페이스만을 이용해서 제품을 생산한다. (`NYPizzaStore`)
+
+#### 주의할점
+- 하지만 딱딱하게 생각하지 말 것.
+  - ConcreteFactory가 AbstractFactory의 역할도 맡도록 구현하는 경우도 있다.
+  - Factory 이면서 동시에 Product인 경우도 있다.
+  - Factory를 Product에 주입하지 않고 Factory가 Product를 생산하는 경우도 있다.
+- 제품 생산의 책임은 ConcreteFactory에 있다.
+- 프로덕트 생성자에 팩토리를 주입하는 방식도 고려할 것.
+- ConcreteFactory를 싱글톤으로 만들어 사용하는 것을 고려할 것.
 
 <img src="abstractfactorypattern/Package%20abstractfactorypattern.png" width="100%">
 
@@ -273,3 +282,17 @@ public class NYPizzaIngredientFactory implements PizzaIngredientFactory {
   ...
 }
 ```
+---
+### Factory Method Pattern vs Abstract Factory Pattern
+- 팩토리 메서드 패턴은 **클래스**를 써서 만들고 추상 팩토리 패턴은 **객체**를 써서 Product를 만든다.
+- 즉 팩토리 메서드 패턴은 **상속**으로 추상 팩토리 패턴은 **구성(Composition)**으로 만든다.
+- 팩토리 메서드 패턴 : 클래스를 확장하고 팩토리 메서드를 오버라이드 한다.
+  - 서브클래스에서 **제품**을 만들기 때문에, 클라이언트와 구상형식을 분리할 수 있다.
+  - 클라이언트는 자신이 사용할 추상 형식만 알면된다.
+  - 장점 : 복잡한 인터페이스, 복잡한 메서드가 필요없다.
+  - 단점 : 한가지 제품만 생산할 수 있다.
+- 추상 팩토리 패턴 : **제품군**을 만드는 추상형식을 제공한다.
+  - 추상형식의 서브클래스에서 제품군을 생산하기 때문에, 추상 형식을 구성(Composition)으로 가지고 있는 클라이언트에게 서브클래스의 인스턴스를 만들어서 전달하면된다.
+  - 서브클래스에서 제품을 생산하는 메서드를 팩토리 메서드 패턴으로 구현할 때도 종종 있다.
+  - 장점 : 연관된 제품을 하나로 묶을 수 있다.
+  - 단점 : 제품군에 제품이 추가된다면, 인터페이스를 바꿔야한다.
