@@ -12,14 +12,16 @@
 
 ## 📝 공부기록
 
-### [Section1-스프링부트 살펴보기](https://github.com/hoa0217/study-repo/blob/master/online-learning/helloboot/Section1.md)
+### [Section1-스프링부트 살펴보기](Section1.md)
 
-### [Section2-스프링부트 시작하기](https://github.com/hoa0217/study-repo/blob/master/online-learning/helloboot/Section2.md)
+### [Section2-스프링부트 시작하기](Section2.md)
 
-### [Section3-독립 실행형 서블릿 애플리케이션](https://github.com/hoa0217/study-repo/blob/master/online-learning/helloboot/Section3.md)
+### [Section3-독립 실행형 서블릿 애플리케이션](Section3.md)
 
-### [Section4-독립 실행형 스프링 애플리케이션](https://github.com/hoa0217/study-repo/blob/master/online-learning/helloboot/Section4.md)
+### [Section4-독립 실행형 스프링 애플리케이션](Section4.md)
 
-### [Section5-DI와 테스트, 디자인 패턴](https://github.com/hoa0217/study-repo/blob/master/online-learning/helloboot/Section5.md)
+### [Section5-DI와 테스트, 디자인 패턴](Section5.md)
+
+### [Section6-자동 구성 기반 애플리케이션](Section6.md)
 
 

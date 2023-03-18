@@ -23,10 +23,13 @@
 <br/>
 
 ## 목차
-### [[Section1] 단위 테스트의 기초](Section1.md)   
-### [[Section2] 빠른 암기법 습득](Section2.md)   
-### [[Section3] 더 큰 설계 그림](Section3.md)   
-### [[Section4] 더 큰 단위 테스트 그림](Section4.md)
+### [Section1-단위 테스트의 기초](Section1.md)
+
+### [Section2-빠른 암기법 습득](Section2.md)
+
+### [Section3-더 큰 설계 그림](Section3.md)
+
+### [Section4-더 큰 단위 테스트 그림](Section4.md)
 
 
 
