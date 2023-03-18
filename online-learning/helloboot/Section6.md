@@ -313,7 +313,7 @@ public @interface MySpringBootApplication {
 
 <img src="img/Section6/11.34.43.png" width="80%">
 
-1. `@EnableMyAutoConfiguration` 생성
+3. `@EnableMyAutoConfiguration` 생성
 - autoconfig의 빈이 늘어날 때 마다 `@MySpringBootApplication`의 Import문이 점점 늘어날 것이다.
 - 최상위 레벨에 애너테이션의 정보들이 나열되는 것을 피하기 위해 새로운 애너테이션을 생성해준다.
     - 현재는 하드코딩되어 있다.
@@ -458,10 +458,10 @@ public @interface EnableMyAutoConfiguration {
     }
     ```
     
-- `ImportCandidates.*load`* 메서드 사용하여 외부파일을 읽어온다.
-    - 자동 구성정보 후보들을 읽어온다.
-    - 파일에 configuration 클래스를 넣어놨다고 해서 전부 구성정보로 쓰는 것이 아니다.
-    - 후보로 잡고 나중에 결정할 수 있다.
+- `ImportCandidates.load` 메서드 사용하여 외부파일을 읽어온다.
+    - 자동 구성정보 **후보**들을 읽어온다.
+      - 파일에 configuration 클래스를 넣어놨다고 해서 전부 구성정보로 쓰는 것이 아니다.
+      - 후보로 잡고 나중에 결정할 수 있다.
   
     <img src="img/Section6/2.32.04.png" width="80%">    
 
@@ -500,7 +500,7 @@ public class MyAutoConfiImportSelector implements DeferredImportSelector {
 
 - classLoader빈을 SpringContainer에게 자동으로 주입받도록 **생성자**를 만들어준다.
 - section4에서 봤던 `BeanClassLoaderAware`를 구현하는 방법도 있음
-    - 하지만 요즘 대세는 setter보단 생성자
+    - 하지만 요즘 대세는 setter보단 **생성자**
   
     <img src="img/Section6/2.45.30.png" width="80%">
 
@@ -515,7 +515,7 @@ public class MyAutoConfiImportSelector implements DeferredImportSelector {
 
 `@Configuration` → `@MyAutoConfiguration`
 
-- 애플리케이션 인프라스트럭쳐 빈 의 Configuration애너테이션을 MyAutoConfiguration으로 바꾼다.
+- 애플리케이션 인프라스트럭쳐 빈의 Configuration애너테이션을 MyAutoConfiguration으로 바꾼다.
     - MyAutoConfiguration은 Configuration를 메타 애너테이션으로 가지고있음.
 - Configuration를 계속 사용해도 impors파일에 등록되어 있기 때문에 기능상 정상동작하지만, 개발자에게 자동구성클래스라는 것을 알리기 위해 MyAutoConfiguration을 사용한다. (관례)
 
