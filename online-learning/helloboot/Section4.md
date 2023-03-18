@@ -365,6 +365,8 @@ public class HellobootApplication {
 
 - 서블릿컨테이너 코드 대신 컨트롤러 클래스에 애노테이션으로 매핑정보를 집어넣는 방법.
 
+<br>
+
 **Dispatcher Servlet**
 
 1. `@RequestMapping` 등 웹 요청을 처리할 수 있는 Mapping정보를 가지고 있는 빈을 스프링컨테이너에서 찾아서 그안에 요청정보들을 추출하여 매핑테이블을 만든다.
@@ -372,6 +374,8 @@ public class HellobootApplication {
     > 하지만 메서드레벨만 Mapping정보를 명시해놓으면 DispatcherServlet은 찾지못하기 때문에 클래스 레벨에 명시를 해줘야 메서드레벨까지 정보를 확인한다.
     > 
 2. 그 후 웹요청이 들어오면 테이블을 참고해서 담당할 빈오브젝트와 메서드를 확인한다.
+
+<br>
 
 **HelloController리팩토링**
 
@@ -399,6 +403,8 @@ public class HelloController {
 ```
 
 하지만 이렇게 수정해도 404에러 발생한다. (`http -v ":8080/hello?name=Spring”`)
+
+<br>
 
 **추가적으로 필요한 것**
 
@@ -447,6 +453,8 @@ public class HelloController {
 - 스프링컨테이너를 생성하고 빈을 등록하여 초기화 해주는 작업
 - 서블릿컨테이너를 코드에서 생성하는 작업
 - 프론트컨트롤러인 Dispatcher서블릿에 스프링컨테이너를 주입하여 서블릿컨테이너에 등록하는 작업
+
+<br>
 
 **리팩토링**
 
@@ -614,12 +622,13 @@ public class SimpleHelloService implements HelloService {
 > 이렇게 장단점이 있지만, 이 방식이 거의 표준처럼 사용이 되며 패키지구성을 잘하고 모듈을 잘 나눠서 개발하면 어떤 클래스가 등록되는지 어렵지 않게 파악을 할 수 있기 때문에 단점을 상쇄할 수 있다.
 > 
 
-`**@Component`의 특징**
+**`@Component`의 특징**
 
 - 이 애노테이션을 직접 빈클래스로 사용할 클래스에 붙여도되지만 이 애노테이션을 메타애노테이션으로 가지고있는 애노테이션에 붙여도 @Component라는 애노테이션이 붙은것과 같은 효과를 낸다.
 - 메타애노테이션 : 애노테이션 위에 붙은 애노테이션
     - 보통 애노테이션은 클래스나 메서드 앞에 붙는다. 그런데 애노테이션도 자바코드로 만들어진 것이기 때문에 애노테이션 위에 또 애노테이션을 붙일 수 있다.
-    
+
+<br>
 
 **예시 (나만의 커스텀 애노테이션 생성)**
 
@@ -647,6 +656,8 @@ public class HelloController {
 ```
 
 → 정상동작 확인 가능
+
+<br>
 
 **왜 쓰는걸까요?**
 
@@ -679,6 +690,8 @@ public class HelloController {
     > `@Controller`, `@RestController`사용하면 좋은 점
     클래스레벨에 `@RequestMapping`을 붙이지 않아도 DispatcherServlet이 안에 Mapping정보가 담겨있다는 것을 판단하고 메서드를 탐색한다.
     > 
+
+<br>
 
 **스테레오 타입** **적용**
 
@@ -730,7 +743,9 @@ public class SimpleHelloService implements HelloService {
 
 이들은 애플리케이션의 기능을 제공하기 위해 만들어지는 object는 아니지만, 없다면 애플리케이션은 시작할 수 없다.
 
-만약 이 두개의 Object도 빈으로 등록한다면? 
+<br>
+
+**만약 이 두개의 Object도 빈으로 등록한다면?**
 
 - 스프링컨테이너가 관리하게 됨으로 나중에 유연한 구성이 가능해진다.
 
@@ -790,15 +805,17 @@ public class HellobootApplication {
 
 <img src="img/Section4/2.00.37.png">
 
-control + h : 하이라키구조 단축키
+> control + h : 하이라키구조 단축키
 
 - DispatcherServlet의 하이라키구조를 보면 `ApplicationContextAware` Interface를 구현하고있다.
 - 들어가면 `setApplicationContext`라는 메서드를 정의하고 있다.
     - 설명을 읽어보면 빈을 컨테이너가 등록하고 관리하는 중에 컨테이너가 관리하는 Object를 Bean에다가 주입해주는 **lifecycle method**라는 것을 알 수있다.
     - 이 인터페이스를 구현한 어떤 클래스가 Bean으로 등록이 되면 스프링컨테이너는 인터페이스의 setter메서드를 통해 주입을 해준다.
     - 스프링컨테이너는 DispatcherServlet이 등록이 되는 시점에 ApplicationContext를 주입해줘야겠다 판단을 하고 자신을 집어넣어 준것
-    
-- HelloController도 ApplicationContextAware를 구현하도록 하여 ApplicationContext출력해보자.
+
+<br>
+
+**HelloController도 ApplicationContextAware를 구현하도록 하여 ApplicationContext출력해보자.**
 
 ```java
 package tobyspring.helloboot;
@@ -833,13 +850,14 @@ public class HelloController implements ApplicationContextAware {
 }
 ```
 
-출력확인 완료
+- 출력확인 완료
 
 ```bash
 Root WebApplicationContext, started on Sun Mar 05 02:13:52 KST 2023
 ```
+<br>
 
-- 생성자로 주입받는것도 가능
+**생성자로 주입받는것도 가능**
 
 ```java
 package tobyspring.helloboot;
@@ -912,6 +930,8 @@ private static void run(Class<?>applicationClass, String... args) {
 - @Configuration 이 붙은 클래스
 - @ComponentScan과 팩토리메서드를 가지고 스프링컨테이너에게 어플리케이션 구성을 어떻게 할 것인가 정보를 알려주는 클래스
 
+<br>
+
 **메서드를 MySpringApplication클래스로 빼주자**
 
 - 다른 어떤 main이 되는 클래스에서도 이 메서드를 재활용 할 수 있어야함.
@@ -983,6 +1003,8 @@ public class HellobootApplication {
 > 
 - 물론 윗부분의 팩터리메서드로 서블릿을 등록해주는 부분과 애노테이션은 다르다.
 - @Configuration + @ComponentScan을 제거하는 부분은 후반부에 나온다.
+
+<br>
 
 **스프링부트에서 제공해주는 run메서드 사용**
 
