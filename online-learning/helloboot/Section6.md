@@ -716,7 +716,9 @@ void springConfiguration(){
     
 
 <br>
+
 💡 결론적으로 스프링컨테이너는 시작할 때 **Configuration프록시클래스**를 생성해서 등록된`@Bean`객체의 개수를 1개로 제한하고 재사용할 수 있도록 캐싱하는 방식을 사용한다.
+
 <br>
 
 **스프링5.2부터 proxyBeanMethods를 끌 수 있다.**
