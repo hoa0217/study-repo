@@ -22,10 +22,6 @@ http localhost:8080/hello?name=Spring
 > 예외를 잡아서 검증하는 방법도 있지만 TestRestTemplate을 쓰자
 > 
 
-1. `org.junit.Assert.*;`
-2. `import org.assertj.core.api.Assertions;`
-3. `import static org.junit.jupiter.api.Assertions.*;`
-
 ```java
 package tobyspring.helloboot;
 
