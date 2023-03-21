@@ -867,3 +867,141 @@ Money reduce(Expression source, String to) {
 > * ~~Bank.reduce(Money)~~
 
 <hr/>
+
+### 14장 바꾸기
+
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * $5 + $5 = &10
+> * $5 + $5에서 Money 반환하기
+> * ~~Bank.reduce(Money)~~
+> * **Money에 대한 통화 변환을 수행하는 Reduce**
+> * Reduce(Bank, String)
+
+#### 2프랑을 달러로 바꾸자.
+```java
+@Test
+public void testReduceMoneyDifferentCurrency() {
+Bank bank = new Bank();
+bank.addRate("CHF", "USD", 2); // 프랑/2 = 달러
+Money result = bank.reduce(Money.franc(2), "USD");
+assertEquals(Money.dollar(1), result);
+}
+```
+- Money
+```java
+@Override
+public Money reduce(String to) {
+int rate = currency.equals("CHF") && to.equals("USD") ? 2 : 1;
+return new Money(amount / rate, to);
+}
+```
+- 이 코드로 인해, 갑자기 Money가 환율에 대해 알게 돼버렸다.
+- 환율에 대한 일은 모두 Bank가 처리해야한다.
+- Expression
+```java
+public interface Expression {
+  Money reduce(Bank bank, String to);
+}
+```
+- Bank
+```java
+public class Bank {
+
+  Money reduce(Expression source, String to) {
+    return source.reduce(this, to);
+  }
+
+  int rate(String from, String to) {
+    return from.equals("CHF") && to.equals("USE") ? 2 : 1;
+  }
+}
+```
+- Money
+```java
+@Override
+public Money reduce(Bank bank, String to) {
+int rate = bank.rate(currency, to);
+return new Money(amount / rate, to);
+}
+```
+- 하지만 아직도 2가 테스트와 코드 두 부분에 **중복**으로 나온다. 
+- 중복을 없애기 위해 환율표를 Bank가 갖도록 만들자.
+
+#### 해시테이블(환율표)의 키를 위한 객체를 만들자.
+- 전용(private) 도우미(helper) 클래스
+```java
+private class Pair {
+
+  private String from;
+  private String to;
+
+  public Pair(String from, String to) {
+    this.from = from;
+    this.to = to;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    Pair pair = (Pair) o;
+    return from.equals(pair.from) && to.equals(pair.to);
+  }
+
+  @Override
+  public int hashCode() {
+    return 0; // 최악의 해시코드, 구현하기 쉽지만 이대로 둔다면 해시 테이블에서 선형 검색과 비슷하게 수행됨.
+  }
+}
+```
+
+#### 환율표를 Bank에 저장하자.
+```java
+public class Bank {
+
+  private Hashtable rates = new Hashtable();
+  
+  ...
+  
+  // 환율을 설정하자.
+  void addRate(String from, String to, int rate) {
+    rates.put(new Pair(from, to), new Integer(rate));
+  }
+
+  // 환율을 얻어내자.
+  int rate(String from, String to) {
+    Integer rate = (Integer) rates.get(new Pair(from, to));
+    return rate.intValue();
+  }
+  ...
+}
+```
+#### 이전 테스트에 빨간 막대가 발생한다.
+```java
+@Test
+public void testReduceMoney() {
+Bank bank = new Bank();
+Money result = bank.reduce(Money.dollar(1), "USD");
+assertEquals(Money.dollar(1), result);
+}
+```
+- USD에서 USD로 환율을 요청하면 그 값은 1이 되어야하는 문제가 발생했다.
+- 또 하나의 새로운 테스트를 작성하고 이를 해결하자.
+```java
+@Test
+public void testIdentityRate(){
+assertEquals(1, new Bank().rate("USD", "USD"));
+}
+```
+- Bank
+```java
+int rate(String from, String to) {
+if(from.equals(to)) return 1;
+Integer rate = (Integer) rates.get(new Pair(from, to));
+return rate.intValue();
+}
+```
+> * $5 + 10CHF = &10 (환율이 2:1일 경우)
+> * ~~$5 + $5 = &10~~
+> * $5 + $5에서 Money 반환하기
+> * ~~Bank.reduce(Money)~~
+> * ~~Money에 대한 통화 변환을 수행하는 Reduce~~
+> * ~~Reduce(Bank, String)~~
