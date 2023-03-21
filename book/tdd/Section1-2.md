@@ -56,6 +56,7 @@ Franc에서는 인스턴스 변수 curreny가 항상 "CHF"이기 때문에 아�
  }
 ```
 컴파일러는 Money가 추상클래스이기 때문에 에러를 뱉는다. Money를 콘크리트 클래스로 구현해주자.
+- Money
 ```java
 Money times(int multiplier){
     return null;
@@ -68,6 +69,7 @@ expected: <tdd.Franc@18842f8c> but was: <tdd.Money@54a36efa>
 
 #### 디버깅을 위해 테스트없이 toString()을 작성하자.
 Money에 toString()을 정의해서 자세히 보자.
+- Money
 ```java
     @Override
     public String toString() {
