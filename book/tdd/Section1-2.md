@@ -1,35 +1,61 @@
 ## 화폐 예제 (10장~17장)
 ### 10장 흥미로운 시간
-두  `times()`의 구현이 거의 비슷하지만 아직 완전히 동일하지 않다. 그런데 바꿀 명백한 방법이 없다. 따라서 다시 팩토리 메서드를 인라인 시켜보자
-- 전장에서 그럼 왜 바꾼거야?라는 의문이 드는게 당연하다
+두  `times()`의 구현이 거의 비슷하지만 아직 완전히 동일하지 않다.
+- Franc
 ```java
  Money times(int multiplier) {
-     return new Dollar(amount * multiplier, "USD");
+     return Money.franc(amont * multiplier);
  }
 ```
+- Dollar
+```java
+ Money times(int multiplier) {
+    return Money.dollar(amont * multiplier);
+ }
+```
+
+#### 다시 팩토리 메서드 인라인..
+그런데 바꿀 명백한 방법이 없다. 따라서 다시 팩토리 메서드를 인라인 시켜보자
+> 전장에서 그럼 왜 바꾼거야?라는 의문이 드는게 당연하다
+
+- Franc
 ```java
  Money times(int multiplier) {
      return new Franc(amount * multiplier, "CHF");
  }
 ```
-Dollar에서는 인스턴스 변수 curreny가 항상 "USD"이기 때문에 아래와 같이 쓸 수있다. (Franc도 마찬가지)
+- Dollar
 ```java
  Money times(int multiplier) {
-     return new Dollar(amount * multiplier, currency);
+    return new Dollar(amount * multiplier, "USD");
  }
 ```
+
+#### 상수를 변수로 바꾸자.
+Franc에서는 인스턴스 변수 curreny가 항상 "CHF"이기 때문에 아래와 같이 쓸 수있다. 
+> Dollar도 마찬가지
+- Franc
 ```java
  Money times(int multiplier) {
      return new Franc(amount * multiplier, currency);
  }
 ```
-그리고 여기서 Franc를 가질지 Money를 가질지가 정말 중요한 사실일까? 우리에겐 테스트 코드들이 있으니 직접 실험해보자.
+- Dollar
+```java
+ Money times(int multiplier) {
+     return new Dollar(amount * multiplier, currency);
+ }
+```
+
+여기서 Franc를 가질지 Money를 가질지가 정말 중요한 사실인가?
+우리에겐 테스트 코드들이 있으니 `Franc.times(int multiplier)`가 Money를 반환하도록 고쳐보자.
+- Franc
 ```java
  Money times(int multiplier) {
      return new Money(amount * multiplier, currency);
  }
 ```
-컴파일러는 추상클래스이기때문에 에러를 뱉는다. 구현해주자.
+컴파일러는 Money가 추상클래스이기 때문에 에러를 뱉는다. Money를 콘크리트 클래스로 구현해주자.
 ```java
 Money times(int multiplier){
     return null;
@@ -37,8 +63,10 @@ Money times(int multiplier){
 ```
 테스트를 해보면 아래와 같은 에러메시지가 난다.
 ```
-expected: <tdd.Dollar@18842f8c> but was: <tdd.Money@54a36efa>
+expected: <tdd.Franc@18842f8c> but was: <tdd.Money@54a36efa>
 ```
+
+#### 디버깅을 위해 테스트없이 toString()을 작성하자.
 Money에 toString()을 정의해서 자세히 보자.
 ```java
     @Override
@@ -49,29 +77,34 @@ Money에 toString()을 정의해서 자세히 보자.
                 '}';
     }
 ```
-> 테스트도 없이 코드를 작성한다?
+> 테스트도 없이 코드를 toString을 작성한다?
 > * toString()은 디버그 출력에만 쓰이기 때문에 잘못 구현됨으로써 얻게 될 리스크가 적다.
 > * 이미 빨간 막대 상태인데 새로운 테스트는 작성하지 않는게 좋다.
 
 결과를 보면 답은 맞았는데 클래스가 다르다. `equals`구현에서 class를 비교할게아닌 currency를 비교해줘야한다.
 ```java
-expected: tdd.Dollar@14832aea<Money{amount=10, currency='USD'}> 
+expected: tdd.Franc@14832aea<Money{amount=10, currency='USD'}> 
 but was: tdd.Money@28b887c<Money{amount=10, currency='USD'}>
 ```
+#### 보수적인 테스트
 빨간 막대 상황에서는 테스트를 작성하고 싶지 않다. 하지만 **실제 모델 코드는 테스트 없이 수정하면 안된다.**
 따라서 보수적인 방법을 사용하자.
 1. 변경된 코드를 되돌려 초록 막대로 돌아간다. 
+
+- Franc
+  ```java
+    Money times(int multiplier) {
+        return new Franc(amount * multiplier, currency);
+    }
+   ```
+  
+- Dollar
    ```java
     Money times(int multiplier) {
         return new Dollar(amount * multiplier, currency);
     }
    ```
-   ```java
-    Money times(int multiplier) {
-        return new Franc(amount * multiplier, currency);
-    }
-   ```
-2. equals()를 위한 테스트를 고치자. :arrow_right: 당연히 실패한다.
+2. equals() 비교를 위한 새로운 테스트를 만들자. :arrow_right: 당연히 실패한다.
    ```java
     @Test
     public void testDifferentClassEquality(){
@@ -80,6 +113,10 @@ but was: tdd.Money@28b887c<Money{amount=10, currency='USD'}>
     }
    ```
 3. 구현코드를 고치자. :arrow_right: 성공
+
+> equals는 클래스가 아니라 curreny를 비교해야한다.
+
+- Money
    ```java
     public boolean equals(Object object){
         Money money = (Money) object;
@@ -88,12 +125,28 @@ but was: tdd.Money@28b887c<Money{amount=10, currency='USD'}>
     }
    ```
 4. 다시 times()에서 Money를 반환하도록 고친 후 테스트를 해보자 :arrow_right: 성공
+
+- Franc
+  ```java
+    Money times(int multiplier) {
+        return new Money(amount * multiplier, currency);
+    }
+   ```
+
+- Dollar
    ```java
     Money times(int multiplier) {
         return new Money(amount * multiplier, currency);
     }
    ```
 5. 두 구현이 동일해졌으니 상위클래스로 올리자!
+
+- Money
+   ```java
+    Money times(int multiplier) {
+        return new Money(amount * multiplier, currency);
+    }
+   ```
 
 > * $5 + 10CHF = &10 (환율이 2:1일 경우)
 > * ~~$5 X 2 = &10~~
