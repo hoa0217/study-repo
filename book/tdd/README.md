@@ -11,4 +11,5 @@
 > **죄악** : 기존 코드 복사해서 붙이기(copy and paste), 함수가 무조건 특정 상수 반환하기 등
 
 ## 목차
-### [Section1-화폐 예제](Section1.md)
+### [Section1-화폐 예제 part1](Section1-1.md)
+### [Section1-화폐 예제 part2](Section1-2.md)
