@@ -78,7 +78,35 @@ public class Start{
 
 ### 변수와 메모리 : 변수! 너 어디 있니?
 
+```java
+package section2.ex2_2;
+
+public class Start2 {
+
+  public static void main(String[] args) {
+    int i;
+    i = 10;
+
+    double d = 20.0;
+  }
+}
+```
+- `int i;`
+    - 메모리에 4바이트 크기의 정수 저장 공간을 main()메서드 스택프레임안에 마련하라는 명령어다.
+    - 아직 초기화 되지 않은 상태이므로, 다른 프로그램이 청소하지 않고 간 값을 그대로 가지고 있게 된다.
+    - 이 상태로 i 변수를 사용하는 코드를 만나게 되면, 컴파일 에러가 발생한다.
+        - `The local variable i may not have been initialized`
     
+    <img src="img/stack1.jpeg" width="70%"/>
+  
+- `i = 10;` `double d = 20.0;`
+    - `double d = 20.0;`의 경우 변수 선언 명령문과 할당 명령문이 한줄에 있는 것
+
+    <img src="img/stack2.jpeg" width="70%"/>
+    
+<hr/>
+
+### 블록 구문과 메모리 : 블록 스택 프레임
 
 
     
