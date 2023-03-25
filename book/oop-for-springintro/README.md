@@ -2,3 +2,4 @@
 
 ## 목차
 ### [Section1-사람을 사랑한 기술](Section1.md)
+### [Section2-자바와 절차적/구조적 프로그래밍](Section2.md)
