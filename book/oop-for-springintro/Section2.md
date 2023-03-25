@@ -133,15 +133,15 @@ public class Start3 {
 - `if (i == 10)` 분기
     - 비교 결과가 true 이므로 if블록의 스택 프레임이 main() 메서드의 스택프레임 안에 **중첩**되어 생성된다.
 - `int m = k + 5;`
-    - 변수 m에 값을 할당한다. 
-    - 이 때 if 스택 프레임 밖에 있는 k 변수를 연산에 참여시킨다.
+    - 변수 `m`에 값을 할당한다. 
+    - 이 때 if 스택 프레임 밖에 있는 `k`변수를 연산에 참여시킨다.
       
-    <img src="img/stack3.jpeg" width="60%"/>
+    <img src="img/stack3.jpeg" width="50%"/>
 
 - if 블록 종료 후 스택 프레임은 소멸된다.
     - else 블록은 스택 메모리에 등장하지도 못했음.
 
-    <img src="img/stack4.jpeg" width="60%"/>
+    <img src="img/stack4.jpeg" width="50%"/>
 
 > 만약 주석을 해제한다면?   
 > m변수와 p변수는 더 이상 존재하지 않는다. 주석을 풀고 실행하면 컴파일 오류가 발생한다.   
@@ -186,7 +186,7 @@ public class Start4 {
 
 - `square()` 호출
     
-    <img src="img/stack5.jpeg" width="60%"/>    
+    <img src="img/stack5.jpeg" width="50%"/>    
 
     - main()메서드의 변수 k와 square()메서드의 변수 k는 별도의 변수 공간이다.
     - 이를 **Call By Value(값에 의한 호출)** 라하며, square()메서드의 k에 무슨 짓을 해도 main()메서드의 k에 영향이 없다.
@@ -238,18 +238,18 @@ public class Start5 {
 ```
 - main메서드 실행 전 T메모리
 
-    <img src="img/stack6.jpeg" width="60%"/>
+    <img src="img/stack6.jpeg" width="50%"/>
   
     - share는 static 변수이므로 클래스 멤버로서 스태틱 영역의 변수 공간에 할당된다.
     
 - fun메서드 호출
   - static 변수 할당 전
     
-    <img src="img/stack7.jpeg" width="60%"/>
+    <img src="img/stack7.jpeg" width="50%"/>
     
   - static 변수 할당 후
 
-    <img src="img/stack8.jpeg" width="60%"/>
+    <img src="img/stack8.jpeg" width="50%"/>
 
 #### 전역변수의 특징
 - 전역 변수는 스택 프레임에 독립적이며, 여러 메서드들이 공유해서 사용할 수 있다.
@@ -259,4 +259,5 @@ public class Start5 {
 #### 결론
 - 전역 변수를 피할 수 있으면 피하라.
 - 하지만 **읽기 전용**으로 값을 공유해서 전역 변수로 쓰는 건 적극 추천. ex) 원주율
-    
+
+<hr/>
