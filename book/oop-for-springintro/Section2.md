@@ -68,7 +68,7 @@ public class Start{
    
    3-5. 구문 실행이 끝나면 `main()`메서드의 스택프레임이 소멸된다.
 4. 실행이 끝나면 JRE는 JVM을 종료한다.
-5. JRE 자체도 운영체제 상의 메모리에서 소멸된다.
+5. JRE도 사용했던 자원을 운영체제에 반납한다. (운영체제 상의 메모리에서 소멸)
 
 - 실제 Debug 화면
   
@@ -97,17 +97,58 @@ public class Start2 {
     - 이 상태로 i 변수를 사용하는 코드를 만나게 되면, 컴파일 에러가 발생한다.
         - `The local variable i may not have been initialized`
     
-    <img src="img/stack1.jpeg" width="70%"/>
+    <img src="img/stack1.jpeg" width="60%"/>
   
 - `i = 10;` `double d = 20.0;`
     - `double d = 20.0;`의 경우 변수 선언 명령문과 할당 명령문이 한줄에 있는 것
 
-    <img src="img/stack2.jpeg" width="70%"/>
+    <img src="img/stack2.jpeg" width="60%"/>
     
 <hr/>
 
 ### 블록 구문과 메모리 : 블록 스택 프레임
 
+```java
+package section2.ex2_3;
 
+public class Start3 {
+
+  public static void main(String[] args) {
+    int i = 10;
+    int k = 20;
+
+    if (i == 10) {
+      int m = k + 5;
+      k = m;
+    } else {
+      int p = k + 10;
+      k = p;
+    }
+  }
+
+  //k = m + p;
+}
+```
+
+- `if (i == 10)` 분기
+    - 비교 결과가 true 이므로 if블록의 스택 프레임이 main() 메서드의 스택프레임 안에 **중첩**되어 생성된다.
+- `int m = k + 5;`
+    - 변수 m에 값을 할당한다. 
+    - 이 때 if 스택 프레임 밖에 있는 k 변수를 연산에 참여시킨다.
+      
+    <img src="img/stack3.jpeg" width="60%"/>
+
+- if 블록 종료 후 스택 프레임은 소멸된다.
+    - else 블록은 스택 메모리에 등장하지도 못했음.
+
+    <img src="img/stack4.jpeg" width="60%"/>
+
+> 만약 주석을 해제한다면?   
+> m변수와 p변수는 더 이상 존재하지 않는다. 주석을 풀고 실행하면 컴파일 오류가 발생한다.   
+> `m cannot be resolved to a variable` , `p cannot be resolved to a variable`
+    
+<hr/>
+
+### 지역 변수와 메모리 : 스택 프레임에 갇혔어요!
     
 
