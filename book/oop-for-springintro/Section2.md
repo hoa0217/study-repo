@@ -8,14 +8,14 @@
 |하드웨어 - 물리적 컴퓨터|JVM(Java Virtual Machine) - 자바 가상 기계|가상의 컴퓨터|
 - JDK를 이용해 개발된 프로그램은 JRE에 의해 가상의 컴퓨터인 JVM상에서 구동된다.
   
-    <img src="img/jvm_jre_jdk2.jpeg" width="70%"/>
+    <img src="img/jvm_jre_jdk2.jpeg" width="50%"/>
   
     - JDK가 JRE를 포함하고 JRE는 JVM을 포함하는 형태로 배포된다.
     - 이로인해 개발자는 본인 OS에 맞는 JVM용으로 프로그램을 작성하고 배포하면 JVM이 중재자로서 각 OS에서 구동하는 데 아무 문제 없이 만들어준다.
 
 - 객체 지향 프로그램의 메모리 사용방식
 
-  <img src="img/t_memory.jpeg" width="70%"/>
+  <img src="img/t_memory.jpeg" width="50%"/>
   
   - 데이터 저장 영역 = T메모리 구조
 
@@ -64,7 +64,7 @@ public class Start{
    3-3. 메서드 인자인 `args`를 스택프레임(stack frame)의 변수 공간에 할당한다.    
    3-4. 메모리 구조 구성 후 `main()`메서드의 첫 명령문을 실행한다.
    
-   <img src="img/run.jpeg" width="70%"/>
+   <img src="img/run.jpeg" width="50%"/>
    
    3-5. 구문 실행이 끝나면 `main()`메서드의 스택프레임이 소멸된다.
 4. 실행이 끝나면 JRE는 JVM을 종료한다.
@@ -97,12 +97,12 @@ public class Start2 {
     - 이 상태로 i 변수를 사용하는 코드를 만나게 되면, 컴파일 에러가 발생한다.
         - `The local variable i may not have been initialized`
     
-    <img src="img/stack1.jpeg" width="60%"/>
+    <img src="img/stack1.jpeg" width="50%"/>
   
 - `i = 10;` `double d = 20.0;`
     - `double d = 20.0;`의 경우 변수 선언 명령문과 할당 명령문이 한줄에 있는 것
 
-    <img src="img/stack2.jpeg" width="60%"/>
+    <img src="img/stack2.jpeg" width="50%"/>
     
 <hr/>
 
