@@ -122,8 +122,86 @@
     ```
 
 #### 추상화와 T메모리
+- 쥐 클래스를 설계해보자.
+  - 클래스 설계(모델링)에서 중요한 것은 추상화다.
+  - 추상화를 통해 애플리케이션 경계 내에서 관심 있는 특성들만 뽑아오자.
+  - 추상화의 결과물 = 모델 = Java의 클래스
+    
+    |쥐|
+    |---------|
+    |성명<br>나이<br>꼬리수|
+    |울다()|
+    
+- UML 클래스 표기법에 따른 클래스
+    ```java
+    package section3.ex3_1;
+    
+    public class Mouse {
+    
+      public String name;
+      public int age;
+      public int countOfTail;
+    
+      public void sing() {
+      }
+    }
+    ```
+- 순수 타이핑으로 로직을 구현한 클래스
+    ```java
+    package section3.ex3_2;
+    
+    public class Mouse {
+    
+      public String name;
+      public int age;
+      public int countOfTail;
+    
+      public void sing() {
+        System.out.println(name + " 찍찍!!!");
+      }
+    }
+    ```
+- 테스트용 클래스
+  ```java
+  package section3.ex3_3;
   
+  import section3.ex3_2.Mouse;
+  
+  public class MouseDrive {
+  
+    public static void main(String[] args) {
+      Mouse mickey = new Mouse();
+      mickey.name = "미키";
+      mickey.age = 85;
+      mickey.countOfTail = 1;
+      mickey.sing();
+  
+      mickey = null;
+  
+      Mouse jeerry = new Mouse();
+      jeerry.name = "제리";
+      jeerry.age = 73;
+      jeerry.countOfTail = 1;
+      jeerry.sing();
+    }
+  }
+  ```
+- 힙 역영 : 객체가 생성되면, 속성의 값을 저장하기 위한 메모리 공간이 **힙영역**에 할당된다.
+  
+  <img src="img/heap.jpeg" width="50%"/>
+  
+  - main()은 클래스 멤버의 메서드이고, sing()은 객체의 멤버 메서드이다.
+    - 클래스 멤버는 밑줄 그어짐 ➡️ UML 표기법
+  - `Mouse mickey` : 객체 참조 변수가 main()메서드 스택 프레임 안에 생성된다.
+  - `new Mouse()` : 객체 생성자를 호출하여 힙 형역에 객체를 배치된다.
+  - `=` : 객체의 주소(포인터)를 객체 참조 변수에 할당한다.
+  - `mickey.name="미키` : 객체 참조 변수와 참조 연산자(`.`)를 이용해 속성에 값을 할당한다.
+  > sing()메서드는 메모리상 변화가 없다. 코드 실행 영역에 실행되어 "미키 찍찍"을 출력할 것.
 
-    
-    
-    
+- 가비지 컬렉터(Garbage Collector) : 아무도 참조하지 않는 객체를 쓰레기로 인지하고 수거해 간다.
+
+  <img src="img/gc.jpeg" width="50%"/>
+  
+  - `mickey = null` : mickey는 더 이상 힙영역의 Mouse객체를 참조하지 않는다. GC가 다녀가면 메모리공간에서 Mouse객체는 사라진다.
+  
+#### 클래스 멤버 vs 객체 멤버 = static 멤버 vs 인스턴스 멤버
