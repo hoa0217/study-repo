@@ -267,5 +267,29 @@
 - 자바에는 inheritance(상속) 대신 **extends(확장)**이 존재한다.
 
 #### 상속의 강력함
+```java
+package section3.ex3_6;
 
+public class 동물 {
+    String myClass;
 
+    동물(){
+        myClass = "동물";
+    }
+
+    void showMe(){
+        System.out.println(myClass);
+    }
+}
+```
+```java
+package section3.inheritance01;
+
+public class 포유류 extends 동물 {
+    포유류(){
+        myClass = "포유류";
+    }
+}
+```
+- 상속한다는 것은 상위 클래스의 특성을 상속한다는 의미이다.
+  - 부모-자식 관계가 아니다.
