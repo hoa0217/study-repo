@@ -264,7 +264,7 @@
     동물 뽀로로 = new 펭귄();
     ```
   - 이는 객체 지향 설계 5원칙 중 LSP(리스코프치환원칙)을 나타내는 말이다.
-- 자바에는 inheritance(상속) 대신 **extends(확장)**이 존재한다.
+- 자바에는 inheritance(상속) 대신 **extends(확장)** 이 존재한다.
 
 #### 상속의 강력함
 ```java
@@ -291,5 +291,86 @@ public class 포유류 extends 동물 {
     }
 }
 ```
+```java
+package section3.inheritance01;
+
+public class Driver {
+
+  public static void main(String[] args) {
+    동물 amimal = new 동물();
+    포유류 mammalia = new 포유류();
+    조류 bird = new 조류();
+    고래 whale = new 고래();
+    박쥐 bat = new 박쥐();
+
+    amimal.showMe();
+    mammalia.showMe();
+    bird.showMe();
+    whale.showMe();
+    bat.showMe();
+  }
+}
+```
+- 상위클래스에서만 `showMe()`를 구현했지만 하위 클래스 객체에서도 사용할 수 있다.
 - 상속한다는 것은 상위 클래스의 특성을 상속한다는 의미이다.
   - 부모-자식 관계가 아니다.
+- 절차적/구조적 프로그래밍의 입장에서 하위 클래스가`showMe()`를 구현하지 않고 재사용을 할 수 있다는 것은 감동임.
+
+```java
+package section3.inheritance01;
+
+public class Driver02 {
+
+  public static void main(String[] args) {
+    동물 amimal = new 동물();
+    동물 mammalia = new 포유류();
+    동물 bird = new 조류();
+    동물 whale = new 고래();
+    동물 bat = new 박쥐();
+
+    amimal.showMe();
+    mammalia.showMe();
+    bird.showMe();
+    whale.showMe();
+    bat.showMe();
+  }
+}
+```
+- 하위클래스는 상위클래스다. 즉 하위분류는 상위분류다.
+  - 포유류 한마리는 동물이다.
+- 이처럼 객체 지향은 현실 세계를, 인간의 논리를 그대로 코드로 옮길 수 있는 힘이 있다.
+
+> `toString()`   
+> 클래스 상속 구조에서 최상위 클래스는 Object다. 그래서 모든 클래스는 toString()메서드를 사용할 수 있다.
+
+#### 상속은 is a 관계를 만족해야 한다?
+- is a는 객체와 클래스의 관계로 오해의 소지가 많다.
+  - 객체 is a 클래스 ➡️ 김연아 is a 사람
+-  is a를 더 명확하게 표현하면 ? **a kind of** 가된다.
+  - 하위 클래스 is a kind of 상위 클래스 ➡️ 펭귄 is a kind of 조류
+
+#### 꼭 기억해야할 세문장
+- 객체 지향의 상속은 상위 클래스의 특성을 재사용하는 것이다.
+- 객체 지향의 상속은 상위 클래스의 특성을 확장하는 것이다.
+- 객체 지향의 상속은 is a kind of관계를 만족해야한다.
+
+#### 다중 상속과 자바
+- 왜 자바는 다중 상속을 지원하지 않는가?
+- **다중 상속의 다이아몬드 문제**가 존재하기 때문이다.
+  - 인어가 사람과 물고기를 상속한다고 가정해보자.
+  - 사람도 수영할 수 있 물고기도 수영할 수 있다.
+  - 그렇다면 인어는 사람처럼 수영해야할까 물고기 처럼 수영해야할까?
+- 대신 **인터페이스**를 도입해 다중 상속의 득은 취하고 실은 과감히 버렸다.
+
+#### 상속과 인터페이스
+- 상속 : 하위클래스 is a kind of 상위클래스
+  - 해석 : 하위클래스는 상위클래스의 한 분류다.
+  - 예제 : 고래는 동물의 한 분류이다.
+- 인터페이스 : 구현 클래스 is able to 인터페이스
+  - 해석 : 구현 클래스는 인터페이스 할 수 있다.
+  - 예제 : 고래는 헤엄칠 수 있다.
+- 상위 클래스는 물려줄 특성이 풍성할 수록 좋다.
+  - 이유 : LSP(리스코프 치환 원칙)
+- 인터페이스는 구현을 강제할 메서드가 적을 수록 좋다.
+  - 이유 : ISP(인터페이스 분할 원칙)
+- 
