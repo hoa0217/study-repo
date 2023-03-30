@@ -322,13 +322,13 @@ package section3.inheritance01;
 public class Driver02 {
 
   public static void main(String[] args) {
-    동물 amimal = new 동물();
+    동물 animal = new 동물();
     동물 mammalia = new 포유류();
     동물 bird = new 조류();
     동물 whale = new 고래();
     동물 bat = new 박쥐();
 
-    amimal.showMe();
+    animal.showMe();
     mammalia.showMe();
     bird.showMe();
     whale.showMe();
@@ -373,4 +373,106 @@ public class Driver02 {
   - 이유 : LSP(리스코프 치환 원칙)
 - 인터페이스는 구현을 강제할 메서드가 적을 수록 좋다.
   - 이유 : ISP(인터페이스 분할 원칙)
-- 
+
+#### 상속과 T메모리
+```java
+package section3.inheritance03;
+
+public class Driver {
+
+  public static void main(String[] args) {
+    Penguin pororo = new Penguin();
+    pororo.name = "뽀로로";
+    pororo.habitat = "남극";
+
+    pororo.showName();
+    pororo.showHabitat();
+
+    Animal pingu = new Penguin();
+    pingu.name = "핑구";
+    //pingu.habitat = "EBS";
+
+    pingu.showName();
+    //pingu.showHabitat();
+  }
+}
+```
+- pingu 객체 참조 변수가 가리키고 있는 것은 Animal 인스턴스이다.
+  - pingu는 자신이 펭귄이라는 사실을 모르고있다. 동물이라는 것만 인식한다.
+  - 따라서 펭귄의 habitat과 showHabitat()을 사용할 수 없다.
+> 명시적 형변환, 암묵적 형변환 공부하기
+
+<hr/>
+
+### 다형성 : 사용편의성
+- 객체지향에서 다형성이라고 하면 오버라이딩(overriding)과 오버로딩(overloading)이라고 할 수 있다.
+  - 오버라이딩 : 같은 메서드 이름, 같은 인자 목록으로 상위 클래스의 메서드를 재정의 
+  - 오버로딩 : 같은 메서드 이름, 다른 인자 목록으로 다수의 메서드를 중복 정의
+```java
+package section3.polymorphism01;
+
+import section3.inheritance03.Animal;
+
+public class Penguin extends Animal {
+  public String habitat;
+
+  public void showHabitat(){
+    System.out.printf("%s는 %s에 살아\n", name, habitat);
+  }
+
+  // 오버라이딩 - 재정의 : 상위클래스의 메서드와 같은 메서드 이름, 같은 인자 리스트
+  @Override
+  public void showName() {
+    System.out.println("내 이름은 알아서 뭐하게요?");
+  }
+  
+  // 오버로딩 - 중복정의 : 같은 메서드 이름, 다른 인자 리스트
+  public void showName(String yourName){
+    System.out.printf("%s 안녕, 나는 %s라고 해\n", yourName, name);
+  }
+}
+```
+```java
+Animal pingu = new Penguin();
+pingu.showName();
+```
+- Animal 객체의 showName()은 Penguin객체의 showName()에 의해 가려져있다.
+  - 따라서 Penguin객체의 showName()이 실행된다.
+- 즉. 상위 클래스 타입의 객체 참조 변수를 사용하더라도 하위 클래스에서 오버라이딩(재정의)한 메서드가 호출된다는 사실을 기억해라.
+
+#### 결론
+- 오버로딩은 함수명 하나를 가지고 인자목록만 달리하면 되므로 사용하기 편리하다.
+  - 제네릭을 이용하면 하나의 함수만 구현해도 다수의 함수 구현 효과를 낼 수 있다.
+- 오버라이딩의 경우 하위 클래스가 재정의한 메서드를 알아서 호출해줌으로 써 깔끔한 코드를 유지할 수 있다.
+
+> 메서드 재정의, 오버로딩을 통한 메서드 중복 정의를 통해 다형성을 제공하고 이 다형성이 개발자가 프로그램을 작성할 때 사용편의성을 준다.
+
+<hr/>
+
+### 캡슐화 : 정보은닉
+
+- 정보은닉(information hiding)이라고 하면 접근 제어자(private, default, protected, public)가 스쳐지나간다.
+
+#### 객체 멤버의 접근 제어자
+- public : 모두가 접근 가능
+- protected : 상속 / 같은 패키지 내의 클래스에서 접근 가능
+- default : 같은 패키지 내의 클래스에서 접근가능
+- private : 본인만 접근 가능
+- 상속을 받지 않았다면 객체 멤버는 객체를 생성한 후 객체 참조 변수를 이용해 접근해야한다.
+- 정적 멤버는 클래스명.정적멤버 형식으로 접근하는 것을 권장한다.
+
+<hr/>
+
+### 참조 변수의 복사 
+- 기본 자료형 변수는 값을 값 자체로 판단한다.
+- 참조 자료형 변수는 값을 주소, 즉 포인터로 판단한다.
+- 기본 자료형 변수를 복사할 때, 참조 자료형 변수를 복사할 때 일어나는 일은 같다.
+  - 즉, 가지고 있는 값을 그대로 복사해서 넘겨준다.
+
+<hr/>
+
+### 정리 - 자바 키워드와 OOP 4대 특성
+- class, extends, new, private, protected, public, static 등
+- 기억해야할 것 : 캡! 상추다
+
+
