@@ -10,9 +10,9 @@
 - 웹서버는 HTTP 프로토콜로 의사소통하기 때문에 HTTP 서버라고 부른다.
 - **클라이언트**는 서버에게 HTTP요청을 보내고 **서버**는 HTTP응답을 돌려준다.
   
-<img src="img/1-1.jpeg" width="60%"/>
+    <img src="img/1-1.jpeg" width="60%"/>
 
-> http://www.oreily.com/index.html 페이지를 열어볼 경우
+    > http://www.oreily.com/index.html 페이지를 열어볼 경우
 
 <hr/>
 
@@ -24,9 +24,9 @@
     - 동적 콘텐츠 리소스 : 사용자, 요청 정보, 시간에 따라 다른 콘텐츠를 생산함.
     - ex) 라이브 영상 시청, 주식 거래, 부동산 DB 검색, 쇼핑몰 구입 등
 
-<img src="img/1-2.jpeg" width="60%"/>
+    <img src="img/1-2.jpeg" width="60%"/>
 
-> 어떤 종류의 콘텐츠 소스도 리소스가 될 수 있다.
+    > 어떤 종류의 콘텐츠 소스도 리소스가 될 수 있다.
 
 #### 1.3.1 미디어 타입
 - 웹 서버는 모든 HTTP 객체 데이터에 **MIME 타입**이라는 **데이터 포맷 라벨**을 붙인다.
@@ -37,7 +37,7 @@
     - 대부분의 웹브라우저는 잘 알려진 수백가지 객체 타입을 다룰 수 있다. (이미지, HTML, 오디오 등)
     > 특별한 포맷 파일의 경우 외부플러그인 SW를 실행하기도 함.
       
-<img src="img/1-3.jpeg" width="60%"/>
+    <img src="img/1-3.jpeg" width="60%"/>
 
 - MIME 타입 : `주 타입(primary object type) / 부 타입(specific subtype)` 으로 이루어진 문자열 라벨이다.
     - HTML 문서 `text/html`
@@ -51,7 +51,7 @@
 - 서버 리소스는 각자 **이름(URI)** 을 갖고 있기 때문에 클라이언트는 관심있는 리소스를 지정할 수 있다.
 - URI(Uniform Resource Identifier) : 리소스를 고유하게 식별하고 위치를 지정할 수 있는 인터넷 주소
 
-<img src="img/1-4.jpeg" width="60%"/>
+    <img src="img/1-4.jpeg" width="60%"/>
 
 - HTTP는 주어진 URI로 객체를 찾아온다.
     - URI에는 **URL**과 **URN**이 있다.
@@ -79,7 +79,7 @@
 - HTTP 트랜잭션 = 요청 명령(클라이언트 ➡️ 서버) + 응답 결과(서버 ➡️ 클라이언트)
     - HTTP 트랜잭션은 HTTP 메세지를 이용해서 이루어짐
       
-<img src="img/1-5.jpeg" width="60%"/>
+    <img src="img/1-5.jpeg" width="60%"/>
 
 #### 1.4.1 메서드
 - HTTP 메서드는 여러 가지 종류의 요청 명령을 지원한다.
@@ -165,7 +165,7 @@
 - 메시지를 전송할 수 있게 되기 전, **인터넷 프로토콜(Internet Protocol, IP)** 과 **포트번호**를 사용해 클라이언트와 서버 사이에 **TCP/IP 커넥션**을 맺어야 한다.
     - IP주소와 포트번호는 URL을 통해 알 수 있다.
     - `http://www.netscape.com/index.html`
-    - DNS(Donmain Name Service)를 통해 http://www.netscape.com(호스트 명)을 IP로 변환하고
+    - DNS(Donmain Name Service)를 통해 `http://www.netscape.com`(호스트 명)을 IP로 변환하고
     - HTTP 통신의 well known port인 80이라고 가정하면된다.
 - HTTP 통신 순서
     1. 웹브라우저는 서버의 URL에서 호스트 명을 추출한다.
@@ -192,3 +192,24 @@
 <hr/>
 
 ### 1.7 프로토콜 버전
+- HTTP/0.9
+    - 1991년의 HTTP 프로토 타입.
+    - 오직 GET 메서드만 지원하며, MIME 타입, HTTP 헤더, 버전 번호는 지원하지 않는다.
+    - 금방 HTTP/1.0으로 대체되었다.
+- HTTP/1.0
+    - 처음으로 널리 쓰이기 시작한 HTTP버전.
+    - 버전 번호, HTTP 헤더, 추가 메서드, 멀티미디어 객체 처리를 추가했다.
+    - 시각적으로 편리한 웹페이지와 상호작용하는 폼을 실현하여 월드 와이드 웹(www)을 대세로 만들었다.
+- HTTP/1.0+
+    - 1990대 중반, www의 급격한 발전으로 여러 기능이 공식적이지 않지만 사실상 표준으로 추가되었다.
+    - 오래 지속되는 **keep-alive** 커넥션, 가상 호스팅 지원, 프락시 연결 지원 등
+    - 이 규격 외 확장된 버전을 흔히들 HTTP/1.0+라고 부른다.
+- HTTP/1.1
+    - HTTP 설계의 구조적 결함 교정, 두드러진 성능 최적화, 잘못된 기능 제거에 집중한 버전이다.
+    - 복잡해진 웹 어플리케이션과 배포를 지원한다.
+    - 현재 HTTP 버전이다.
+- HTTP/2.0
+    - HTTP/1.1 성능 문제를 개선하기 위해 설계가 진행중인 프로토콜
+
+<hr/>
+    
