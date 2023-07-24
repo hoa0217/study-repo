@@ -1,32 +1,48 @@
 package study.datajpa.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(of = {"id", "username", "age"})
 public class Member {
 
   @Id
   @GeneratedValue
+  @Column(name = "member_id")
   private Long id;
-  private String userName;
+  private String username;
+  private int age;
 
-  // jpa 표준스펙으로 entity를 만들 땐 default 생성자가 필요.
-  // 또한 protected까진 열어놔야함
-  // jpa 프록싱할 때 private으로 막아놓으면 제대로 동작하지 못함.
-  protected Member() {
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "team_id")
+  private Team team;
+
+  public Member(String username) {
+    this.username = username;
   }
 
-  public Member(String userName) {
-    this.userName = userName;
+  public Member(String username, int age, Team team) {
+    this.username = username;
+    this.age = age;
+    if (team != null) {
+      this.team = team;
+    }
   }
 
-  public void changeUsername(String userName) {
-    this.userName = userName;
+  public void changeTeam(Team team) {
+    this.team = team;
+    team.getMembers().add(this);
   }
 }

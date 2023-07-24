@@ -11,6 +11,7 @@ spring:
       hibernate:
 #        show_sql: true # 콘솔 찍기
         format_sql: true
+
 logging.level:
   org.hibernate.SQL: debug # 로깅
 #  org.hibernate.type: trace # 파라미터 추척

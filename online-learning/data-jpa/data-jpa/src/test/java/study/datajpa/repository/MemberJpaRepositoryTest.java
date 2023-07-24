@@ -25,7 +25,7 @@ class MemberJpaRepositoryTest {
     Member findMember = memberJpaRepository.find(savedMember.getId());
 
     assertThat(findMember.getId()).isEqualTo(member.getId());
-    assertThat(findMember.getUserName()).isEqualTo(member.getUserName());
+    assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
     assertThat(findMember).isEqualTo(member); // 같은 트랜잭션 안에서 같은 엔티티는 같은 인스턴스임을 보장한다.
   }
 }
