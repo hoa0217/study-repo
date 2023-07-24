@@ -1,7 +1,5 @@
 package study.datajpa.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -12,14 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-@Rollback(value = false)
+@Rollback(false)
 class MemberTest {
 
   @PersistenceContext
   EntityManager em;
 
   @Test
-  public void testEntity(){
+  public void testEntity() {
     Team teamA = new Team("teamA");
     Team teamB = new Team("teamB");
     em.persist(teamA);
