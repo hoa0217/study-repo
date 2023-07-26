@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +32,9 @@ class MemberRepositoryTest {
 
   @Autowired
   private TeamRepository teamRepository;
+
+  @PersistenceContext
+  EntityManager em;
 
   @Test
   public void save() {
@@ -239,7 +244,7 @@ class MemberRepositoryTest {
 
     int age = 10;
     PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Direction.DESC, "username"));
-    Page<Member> pageJoinByAge = memberRepository.findPageJoinByAge(age, pageRequest);
+    Page<Member> page = memberRepository.findPageJoinByAge(age, pageRequest);
   }
 
   @Test
@@ -254,10 +259,56 @@ class MemberRepositoryTest {
 
     int age = 10;
     PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Direction.DESC, "username"));
-    Page<Member> pageJoinByAge = memberRepository.findPageJoinCountByAge(age, pageRequest);
+    Page<Member> page = memberRepository.findPageJoinCountByAge(age, pageRequest);
 
     // 페이지 내부 엔티티 dto로 변환
-    Page<MemberDto> dtoPage = pageJoinByAge
+    Page<MemberDto> dtoPage = page
         .map(m -> new MemberDto(m.getId(), m.getUsername(), null));
+  }
+
+  @Test
+  public void findPageFetchJoinCountByAge(){
+    // given
+    Team team = new Team("teamA");
+    teamRepository.save(team);
+    memberRepository.save(new Member("member1", 10, team));
+    memberRepository.save(new Member("member2", 10, team));
+    memberRepository.save(new Member("member3", 10, team));
+    memberRepository.save(new Member("member4", 10, team));
+    memberRepository.save(new Member("member5", 10, team));
+    memberRepository.save(new Member("member6", 10, team));
+
+    int age = 10;
+    PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Direction.DESC, "username"));
+    Page<Member> page = memberRepository.findPageFetchJoinCountByAge(age, pageRequest);
+
+    // then
+    List<Member> pageContent = page.getContent();
+    assertThat(pageContent.size()).isEqualTo(3);
+    assertThat(page.getTotalElements()).isEqualTo(6);
+    assertThat(page.getNumber()).isEqualTo(0);
+    assertThat(page.getTotalPages()).isEqualTo(2);
+    assertThat(page.isFirst()).isTrue();
+    assertThat(page.hasNext()).isTrue();
+  }
+
+  @Test
+  public void bulkAgePlus(){
+    // given
+    memberRepository.save(new Member("member1", 10));
+    memberRepository.save(new Member("member2", 19));
+    memberRepository.save(new Member("member3", 20));
+    memberRepository.save(new Member("member4", 21));
+    memberRepository.save(new Member("member5", 40));
+
+    // 벌크연산은 영속성컨텍스트를 무시하고 바로 db에 반영한다. (mybatis를 함께 쓸 때도 마찬가지)
+    // 따라서 벌크연산 이후엔 영속성 컨텍스트를 날려야한다.
+    // 같은 트랜잭션에서 로직이 일어나면 큰일난다!
+    int resultCount = memberRepository.bulkAgePlus(20);
+    // em.clear(); 또는 @Modifying(clearAutomatically = true)옵션 추가 필요
+
+    assertThat(resultCount).isEqualTo(3);
+    Member member5 = memberRepository.findMemberByUsername("member5");
+    assertThat(member5.getAge()).isEqualTo(41);
   }
 }

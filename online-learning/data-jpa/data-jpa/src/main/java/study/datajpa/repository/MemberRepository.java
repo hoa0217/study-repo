@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
@@ -46,7 +47,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
   @Query(value = "select m from Member m left join m.team t where m.age = :age")
   Page<Member> findPageJoinByAge(int age, Pageable pageable);
 
-  @Query(value = "select m from Member m left join m.team t where m.age = :age"
+  @Query(value = "select m from Member m left join  m.team t where m.age = :age"
       , countQuery = "select count(m) from Member m where m.age = :age")
   Page<Member> findPageJoinCountByAge(int age, Pageable pageable);
+
+  @Query(value = "select m from Member m join m.team t where m.age = :age")
+  Page<Member> findPageFetchJoinCountByAge(int age, Pageable pageable);
+
+  @Modifying(clearAutomatically = true)
+  @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
+  int bulkAgePlus(int age);
 }
