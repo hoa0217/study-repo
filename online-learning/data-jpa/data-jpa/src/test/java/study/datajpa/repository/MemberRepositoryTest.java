@@ -9,6 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -148,5 +153,111 @@ class MemberRepositoryTest {
         .isInstanceOf(IncorrectResultSizeDataAccessException.class);
     assertThatThrownBy(() -> memberRepository.findOptionalByUsername("AAA"))
         .isInstanceOf(IncorrectResultSizeDataAccessException.class);
+  }
+
+  @Test
+  public void paging(){
+    // given
+    memberRepository.save(new Member("member1", 10));
+    memberRepository.save(new Member("member2", 10));
+    memberRepository.save(new Member("member3", 10));
+    memberRepository.save(new Member("member4", 10));
+    memberRepository.save(new Member("member5", 10));
+    memberRepository.save(new Member("member6", 10));
+
+    int age = 10;
+    PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Direction.DESC, "username"));
+
+    // when
+    Page<Member> page = memberRepository.findPageByAge(age, pageRequest);
+
+    // then
+    List<Member> pageContent = page.getContent();
+    assertThat(pageContent.size()).isEqualTo(3);
+    assertThat(page.getTotalElements()).isEqualTo(6);
+    assertThat(page.getNumber()).isEqualTo(0);
+    assertThat(page.getTotalPages()).isEqualTo(2);
+    assertThat(page.isFirst()).isTrue();
+    assertThat(page.hasNext()).isTrue();
+  }
+
+  @Test
+  public void slicing(){
+    // given
+    memberRepository.save(new Member("member1", 10));
+    memberRepository.save(new Member("member2", 10));
+    memberRepository.save(new Member("member3", 10));
+    memberRepository.save(new Member("member4", 10));
+    memberRepository.save(new Member("member5", 10));
+    memberRepository.save(new Member("member6", 10));
+
+    int age = 10;
+    PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Direction.DESC, "username"));
+
+    // when
+    Slice<Member> slice = memberRepository.findSliceByAge(age, pageRequest);
+
+    // then
+    List<Member> sliceContent = slice.getContent();
+    assertThat(sliceContent.size()).isEqualTo(3);
+    // assertThat(slice.getTotalElements()).isEqualTo(6);
+    assertThat(slice.getNumber()).isEqualTo(0);
+    // assertThat(slice.getTotalPages()).isEqualTo(2);
+    assertThat(slice.isFirst()).isTrue();
+    assertThat(slice.hasNext()).isTrue();
+  }
+
+  @Test
+  public void listing(){
+    // given
+    memberRepository.save(new Member("member1", 10));
+    memberRepository.save(new Member("member2", 10));
+    memberRepository.save(new Member("member3", 10));
+    memberRepository.save(new Member("member4", 10));
+    memberRepository.save(new Member("member5", 10));
+    memberRepository.save(new Member("member6", 10));
+
+    int age = 10;
+    PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Direction.DESC, "username"));
+
+    // when
+    List<Member> members = memberRepository.findListByAge(age, pageRequest);
+
+    // then
+    assertThat(members).hasSize(3);
+  }
+
+  @Test
+  public void findPageJoinByAge(){
+    // given
+    memberRepository.save(new Member("member1", 10));
+    memberRepository.save(new Member("member2", 10));
+    memberRepository.save(new Member("member3", 10));
+    memberRepository.save(new Member("member4", 10));
+    memberRepository.save(new Member("member5", 10));
+    memberRepository.save(new Member("member6", 10));
+
+    int age = 10;
+    PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Direction.DESC, "username"));
+    Page<Member> pageJoinByAge = memberRepository.findPageJoinByAge(age, pageRequest);
+  }
+
+  @Test
+  public void findPageJoinCountByAge(){
+    // given
+    memberRepository.save(new Member("member1", 10));
+    memberRepository.save(new Member("member2", 10));
+    memberRepository.save(new Member("member3", 10));
+    memberRepository.save(new Member("member4", 10));
+    memberRepository.save(new Member("member5", 10));
+    memberRepository.save(new Member("member6", 10));
+
+    int age = 10;
+    PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Direction.DESC, "username"));
+    Page<Member> pageJoinByAge = memberRepository.findPageJoinCountByAge(age, pageRequest);
+
+    // 페이지 내부 엔티티 dto로 변환
+    Page<MemberDto> dtoPage = pageJoinByAge
+        .map(m -> new MemberDto(m.getId(), m.getUsername(), null));
   }
 }
