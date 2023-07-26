@@ -382,4 +382,47 @@ class MemberRepositoryTest {
       System.out.println("member.team = " + member.getTeam());
     }
   }
+
+  @Test
+  public void queryHint(){
+    // given
+    Member member1 = memberRepository.save(new Member("member1", 10));
+    em.flush();
+    em.clear();
+
+    // when
+    // 변경감지 -> 데이터를 2개를 가지고 있어야한다.
+    // 원본을 알고있어야 더티체킹이 일어날 수 있음. 결국 비용 즉, 메모리를 많이 먹는다.
+    // 만약 조회용으로만 쓸거야! 한다면? 쿼리힌트를 사용해보자
+    // Member findMember = memberRepository.findById(member1.getId()).get();
+    Member findMember = memberRepository.findReadOnlyByUsername(member1.getUsername());
+    findMember.changeName("member2");
+
+    em.flush();
+  }
+
+  @Test
+  public void lock(){
+    // given
+    Member member1 = memberRepository.save(new Member("member1", 10));
+    em.flush();
+    em.clear();
+
+    // when
+    List<Member> lockByUsername = memberRepository.findLockByUsername(member1.getUsername());
+
+    /**
+     *     select
+     *         member0_.member_id as member_i1_0_,
+     *         member0_.age as age2_0_,
+     *         member0_.team_id as team_id4_0_,
+     *         member0_.username as username3_0_
+     *     from
+     *         member member0_
+     *     where
+     *         member0_.username=? for update (jpa가 제공하는 lock 사용, 책으로 공부하셈)
+     */
+
+    // 실시간 트래픽이 많은 서비스에서 lock은 웬만하면 걸지마라. 다른 방법으로 해결하는 걸 권장함.
+  }
 }

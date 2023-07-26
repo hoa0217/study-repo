@@ -3,13 +3,17 @@ package study.datajpa.repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.LockModeType;
+import javax.persistence.QueryHint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
@@ -77,4 +81,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
   @EntityGraph(attributePaths = {"team"})
   @Query("select m from Member m where m.username = :username")
   List<Member> findEntityGraphByUsername(String username);
+
+  // 대부분 복잡한 쿼리 자체가 잘못돼서 장애가 남,, 트래픽이 많지 않은데 넣어봤자 최적화 많이 안됨. 성능테스트 해보고 결정.
+  // 그리고 느리면 대부분 redis를 깔지 이걸 먼저 하지는 않음. 처음부터 튜닝을 깐다? 좋지 않은 선택이다.
+  @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+  Member findReadOnlyByUsername(String username);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  List<Member> findLockByUsername(String username);
 }
