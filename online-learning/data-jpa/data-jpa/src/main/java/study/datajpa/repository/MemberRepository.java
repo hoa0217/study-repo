@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,8 +15,6 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
-
-  List<Member> findByUsername(String username);
 
   // 파라미터가 2개가 넘어가면 메서드가 너무 길어진다. 이때는 직접 짜도록하자.
   List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
@@ -57,4 +56,25 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
   @Modifying(clearAutomatically = true)
   @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
   int bulkAgePlus(int age);
+
+  // 한번에 join해서 쿼리가 1번 나감 (지연 로딩X)
+  @Query("select m from Member m left join fetch m.team")
+  List<Member> findMemberFetchJoin();
+
+  // 결과적으로 fetch join
+  @EntityGraph(attributePaths = {"team"})
+  List<Member> findAll();
+
+  // 쿼리를 짰으나 fetch join을 추가하고 싶을 때
+  @EntityGraph(attributePaths = {"team"})
+  @Query("select m from Member m")
+  List<Member> findEntityGraph();
+
+  List<Member> findByUsername(String username);
+
+  // 기본적으로 fetch join 시 left outer join이 나감
+  // 너무 복잡한 쿼리일 땐 JPQL fetch join문을 짜자
+  @EntityGraph(attributePaths = {"team"})
+  @Query("select m from Member m where m.username = :username")
+  List<Member> findEntityGraphByUsername(String username);
 }

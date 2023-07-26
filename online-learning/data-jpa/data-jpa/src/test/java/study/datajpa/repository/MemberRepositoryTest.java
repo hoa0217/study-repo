@@ -161,7 +161,7 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void paging(){
+  public void paging() {
     // given
     memberRepository.save(new Member("member1", 10));
     memberRepository.save(new Member("member2", 10));
@@ -187,7 +187,7 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void slicing(){
+  public void slicing() {
     // given
     memberRepository.save(new Member("member1", 10));
     memberRepository.save(new Member("member2", 10));
@@ -213,7 +213,7 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void listing(){
+  public void listing() {
     // given
     memberRepository.save(new Member("member1", 10));
     memberRepository.save(new Member("member2", 10));
@@ -233,7 +233,7 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void findPageJoinByAge(){
+  public void findPageJoinByAge() {
     // given
     memberRepository.save(new Member("member1", 10));
     memberRepository.save(new Member("member2", 10));
@@ -248,7 +248,7 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void findPageJoinCountByAge(){
+  public void findPageJoinCountByAge() {
     // given
     memberRepository.save(new Member("member1", 10));
     memberRepository.save(new Member("member2", 10));
@@ -267,7 +267,7 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void findPageFetchJoinCountByAge(){
+  public void findPageFetchJoinCountByAge() {
     // given
     Team team = new Team("teamA");
     teamRepository.save(team);
@@ -293,7 +293,7 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void bulkAgePlus(){
+  public void bulkAgePlus() {
     // given
     memberRepository.save(new Member("member1", 10));
     memberRepository.save(new Member("member2", 19));
@@ -310,5 +310,76 @@ class MemberRepositoryTest {
     assertThat(resultCount).isEqualTo(3);
     Member member5 = memberRepository.findMemberByUsername("member5");
     assertThat(member5.getAge()).isEqualTo(41);
+  }
+
+  @Test
+  public void findMemberLazy() {
+    // given
+    Team teamA = new Team("teamA");
+    Team teamB = new Team("teamB");
+    teamRepository.save(teamA);
+    teamRepository.save(teamB);
+    Member memberA = new Member("memberA", 10, teamA);
+    Member memberB = new Member("memberB", 10, teamB);
+    memberRepository.save(memberA);
+    memberRepository.save(memberB);
+
+    em.flush(); // db 반영
+    em.clear(); // 영속성 컨텍스트 날리기
+
+    // when N(2) + 1
+    // select member 1
+    List<Member> members = memberRepository.findAll();
+    for (Member member : members) {
+      System.out.println("member = " + member);
+      System.out.println("member.teamClass = " + member.getTeam().getClass());
+      System.out.println("member.team = " + member.getTeam());
+    }
+  }
+
+  @Test
+  public void findMemberFetchJoin() {
+    // given
+    Team teamA = new Team("teamA");
+    Team teamB = new Team("teamB");
+    teamRepository.save(teamA);
+    teamRepository.save(teamB);
+    Member memberA = new Member("memberA", 10, teamA);
+    Member memberB = new Member("memberB", 10, teamB);
+    memberRepository.save(memberA);
+    memberRepository.save(memberB);
+
+    em.flush(); // db 반영
+    em.clear(); // 영속성 컨텍스트 날리기
+
+    List<Member> members = memberRepository.findMemberFetchJoin();
+    for (Member member : members) {
+      System.out.println("member = " + member);
+      System.out.println("member.teamClass = " + member.getTeam().getClass());
+      System.out.println("member.team = " + member.getTeam());
+    }
+  }
+
+  @Test
+  public void findEntityGraphByUsername() {
+    // given
+    Team teamA = new Team("teamA");
+    Team teamB = new Team("teamB");
+    teamRepository.save(teamA);
+    teamRepository.save(teamB);
+    Member memberA = new Member("memberA", 10, teamA);
+    Member memberB = new Member("memberA", 10, teamB);
+    memberRepository.save(memberA);
+    memberRepository.save(memberB);
+
+    em.flush(); // db 반영
+    em.clear(); // 영속성 컨텍스트 날리기
+
+    List<Member> members = memberRepository.findEntityGraphByUsername("memberA");
+    for (Member member : members) {
+      System.out.println("member = " + member);
+      System.out.println("member.teamClass = " + member.getTeam().getClass());
+      System.out.println("member.team = " + member.getTeam());
+    }
   }
 }
