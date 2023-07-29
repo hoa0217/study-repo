@@ -44,4 +44,25 @@ class MemberTest {
     }
   }
 
+  @Test
+  public void JPAEventBaseEntity() throws InterruptedException {
+    // given
+    Member member1 = new Member("member1");
+    em.persist(member1);
+
+    Thread.sleep(100);
+    member1.changeName("member2");
+
+    em.flush(); // @PreUpdate
+    em.clear();
+
+    // when
+    Member findMember = em.find(Member.class, member1.getId());
+
+    // then
+    System.out.println("findMember.createdDate = " + findMember.getCreatedDate());
+    System.out.println("findMember.lastModifiedDate = " + findMember.getLastModifiedDate());
+    System.out.println("findMember.createdBy = " + findMember.getCreatedBy());
+    System.out.println("findMember.lastModifiedBy = " + findMember.getLastModifiedBy());
+  }
 }
