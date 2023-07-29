@@ -36,6 +36,9 @@ class MemberRepositoryTest {
   @PersistenceContext
   EntityManager em;
 
+  @Autowired
+  private MemberQueryRepository memberQueryRepository;
+
   @Test
   public void save() {
     System.out.println("memberRepository = " + memberRepository
@@ -424,5 +427,11 @@ class MemberRepositoryTest {
      */
 
     // 실시간 트래픽이 많은 서비스에서 lock은 웬만하면 걸지마라. 다른 방법으로 해결하는 걸 권장함.
+  }
+
+  @Test
+  public void callCustom(){
+    List<Member> memberCustom = memberRepository.findMemberCustom(); // custom repository
+    List<Member> allMembers = memberQueryRepository.findAllMembers(); // 클래스가 쪼개진 repository
   }
 }
