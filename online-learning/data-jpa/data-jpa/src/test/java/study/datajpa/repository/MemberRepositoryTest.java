@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
+import study.datajpa.dto.UsernameOnlyDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
@@ -387,7 +388,7 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void queryHint(){
+  public void queryHint() {
     // given
     Member member1 = memberRepository.save(new Member("member1", 10));
     em.flush();
@@ -405,7 +406,7 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void lock(){
+  public void lock() {
     // given
     Member member1 = memberRepository.save(new Member("member1", 10));
     em.flush();
@@ -430,8 +431,32 @@ class MemberRepositoryTest {
   }
 
   @Test
-  public void callCustom(){
+  public void callCustom() {
     List<Member> memberCustom = memberRepository.findMemberCustom(); // custom repository
     List<Member> allMembers = memberQueryRepository.findAllMembers(); // 클래스가 쪼개진 repository
+  }
+
+  @Test
+  public void projections() {
+    // given
+    Team teamA = new Team("teamA");
+    teamRepository.save(teamA);
+
+    Member memberA = new Member("memberA", 10, teamA);
+    Member memberB = new Member("memberB", 10, teamA);
+    memberRepository.save(memberA);
+    memberRepository.save(memberB);
+
+    em.flush(); // db 반영
+    em.clear(); // 영속성 컨텍스트 날리기
+
+    // when
+    List<NestedClosedProjections> result = memberRepository
+        .findProjectionsByUsername("memberA", NestedClosedProjections.class);
+
+    for (NestedClosedProjections userNameOnly : result) {
+        System.out.println("userNameOnly.getUsername = " + userNameOnly.getUsername());
+      System.out.println("userNameOnly.getTeam = " + userNameOnly.getTeam());
+    }
   }
 }

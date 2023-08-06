@@ -16,6 +16,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
+import study.datajpa.dto.UsernameOnlyDto;
 import study.datajpa.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
@@ -89,4 +90,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   List<Member> findLockByUsername(String username);
+
+  <T> List<T> findProjectionsByUsername(@Param("username") String username, Class<T> type);
 }
