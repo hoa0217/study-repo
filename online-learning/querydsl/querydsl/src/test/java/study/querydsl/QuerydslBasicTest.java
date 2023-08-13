@@ -1,9 +1,13 @@
 package study.querydsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static study.querydsl.entity.QMember.member;
 
+import com.querydsl.core.NonUniqueResultException;
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,5 +84,34 @@ public class QuerydslBasicTest {
         .fetchOne();
 
     assertThat(member.getUsername()).isEqualTo("member1");
+  }
+
+  @Test
+  public void resultFetch() {
+    List<Member> fetch = queryFactory
+        .selectFrom(member)
+        .fetch();
+
+    // 결과가 2개 이상이기 때문에 exception이 터짐.
+    assertThatThrownBy(() -> queryFactory
+        .selectFrom(member)
+        .fetchOne()).isInstanceOf(NonUniqueResultException.class);
+
+    Member fetchFirst = queryFactory
+        .selectFrom(member)
+        .fetchFirst();
+
+    QueryResults<Member> results = queryFactory
+        .selectFrom(member)
+        .fetchResults();
+
+    // 페이징을 위한 total count를 가져와야하기 때문에 쿼리가 2번 나간다.
+    // 복잡하고 성능이 중요한 페이징 쿼리에서는 fetchResults를 쓰면 안되고, count 쿼리를 직접 날려야한다.
+    long total = results.getTotal();
+    List<Member> members = results.getResults();
+
+    long count = queryFactory
+        .selectFrom(member)
+        .fetchCount();
   }
 }
