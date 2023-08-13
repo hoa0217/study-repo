@@ -229,7 +229,7 @@ public class QuerydslBasicTest {
    * 세타 조인(연관관계가 없는 필드로 조인) 회원의 이름이 팀 이름과 같은 회원 조회
    **/
   @Test
-  public void theta_join(){
+  public void theta_join() {
     em.persist(new Member("teamA"));
     em.persist(new Member("teamB"));
     em.persist(new Member("teamC"));
@@ -242,5 +242,42 @@ public class QuerydslBasicTest {
     assertThat(result)
         .extracting("username")
         .containsExactly("teamA", "teamB");
+  }
+
+  /**
+   * 회원과 팀을 조인하면서, 팀이름이 teamA인 팀만 조인, 회원은 모두 조회 JPQL : select m, t from Member m left join m.team t
+   * on t.name = 'teamA'
+   */
+  @Test
+  public void join_on_filterling() {
+    List<Tuple> result = queryFactory
+        .select(member, team)
+        .from(member)
+        .leftJoin(member.team, team).on(team.name.eq("teamA"))
+        .fetch();
+
+    for (Tuple tuple : result) {
+      System.out.println("tuple = " + tuple);
+    }
+  }
+
+  /**
+   * 연관관계 없는 엔티티 외부조인 회원의 이름이 팀 이름과 같은 대상 외부 조인
+   */
+  @Test
+  public void join_on_no_relation() {
+    em.persist(new Member("teamA"));
+    em.persist(new Member("teamB"));
+    em.persist(new Member("teamC"));
+
+    List<Tuple> result = queryFactory
+        .select(member, team)
+        .from(member)
+        .join(team).on(member.username.eq(team.name))
+        .fetch();
+
+    for (Tuple tuple : result) {
+      System.out.println("tuple = " + tuple);
+    }
   }
 }
