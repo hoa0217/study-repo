@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.QMemberDto;
 import study.querydsl.dto.UserDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -550,6 +551,7 @@ public class QuerydslBasicTest {
 
   @Test
   public void findUserDtoByConstructor() {
+    // 단점 : 런타임 오류로 잡음.
     List<UserDto> results = queryFactory
         .select(Projections.constructor(
             UserDto.class,
@@ -562,6 +564,21 @@ public class QuerydslBasicTest {
 
     for (UserDto userDto : results) {
       System.out.println("userDto = " + userDto);
+    }
+  }
+
+  @Test
+  public void findDtoByQueryProjection(){
+    // 장점 : 컴파일 오류로 타입 체크 가능.
+    // 단점 : Q파일 생성,
+    // Dto가 QueryDsl에 의존성을 갖게됨 @QueryProjection, 그리고 이 Dto는 서비스, 컨트롤러에서도 사용 가능함. -> 순수하지 않은 의존적 설계
+    List<MemberDto> results = queryFactory
+        .select(new QMemberDto(member.username, member.age))
+        .from(member)
+        .fetch();
+
+    for (MemberDto memberDto : results) {
+      System.out.println("memberDto = " + memberDto);
     }
   }
 }
