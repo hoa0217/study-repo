@@ -9,18 +9,24 @@ import static study.querydsl.entity.QTeam.team;
 import com.querydsl.core.NonUniqueResultException;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
+import javax.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.UserDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
@@ -452,7 +458,8 @@ public class QuerydslBasicTest {
   public void concat() {
     //username_age
     List<String> result = queryFactory
-        .select(member.username.concat("_").concat(member.age.stringValue())) // stringValue를 사용할 일이 꽤 많다 (특히 Enum)
+        .select(member.username.concat("_")
+            .concat(member.age.stringValue())) // stringValue를 사용할 일이 꽤 많다 (특히 Enum)
         .from(member)
         .fetch();
 
@@ -461,4 +468,100 @@ public class QuerydslBasicTest {
     }
   }
 
+  // Tuple은 repository단에서만 사용하는 것은 괜찮음. 하지만 sevice단으로 던질 때 dto로 바꿔서 던져라
+  // why? 상위 모듈(비즈니스 로직 계층)이 하위 모듈의 기술에 알 필요도 의존해서도 안되기 때문.
+
+  @Test
+  public void findDtoByJPQL() {
+    List<MemberDto> results = em
+        .createQuery("select new study.querydsl.dto.MemberDto(m.username, m.age) from Member m",
+            MemberDto.class)
+        .getResultList();
+
+    for (MemberDto result : results) {
+      System.out.println("memberDto = " + result);
+    }
+  }
+
+  @Test
+  public void findDtoBySetter() {
+    List<MemberDto> results = queryFactory
+        .select(Projections.bean(MemberDto.class,
+            member.username,
+            member.age))
+        .from(member)
+        .fetch();
+
+    for (MemberDto result : results) {
+      System.out.println("memberDto = " + result);
+    }
+  }
+
+  @Test
+  public void findDtoByFields() {
+    List<MemberDto> results = queryFactory
+        .select(Projections.fields(MemberDto.class,
+            member.username,
+            member.age))
+        .from(member)
+        .fetch();
+
+    for (MemberDto result : results) {
+      System.out.println("memberDto = " + result);
+    }
+  }
+
+  @Test
+  public void findDtoByConstructor() {
+    List<MemberDto> results = queryFactory
+        .select(Projections.constructor(MemberDto.class,
+            member.username,
+            member.age))
+        .from(member)
+        .fetch();
+
+    for (MemberDto result : results) {
+      System.out.println("memberDto = " + result);
+    }
+  }
+
+  @Test
+  public void findUserDto() {
+    QMember memberSub = new QMember("memberSub");
+
+    List<UserDto> results = queryFactory
+        .select(Projections.fields
+            (
+                UserDto.class,
+                member.username.as("name"),
+                ExpressionUtils.as(
+                    JPAExpressions
+                        .select(memberSub.age.max())
+                        .from(memberSub), "age")
+            )
+        )
+        .from(member)
+        .fetch();
+
+    for (UserDto userDto : results) {
+      System.out.println("userDto = " + userDto);
+    }
+  }
+
+  @Test
+  public void findUserDtoByConstructor() {
+    List<UserDto> results = queryFactory
+        .select(Projections.constructor(
+            UserDto.class,
+            member.username,
+            member.age
+            )
+        )
+        .from(member)
+        .fetch();
+
+    for (UserDto userDto : results) {
+      System.out.println("userDto = " + userDto);
+    }
+  }
 }
