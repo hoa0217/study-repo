@@ -11,7 +11,9 @@ import com.querydsl.core.NonUniqueResultException;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -586,7 +588,7 @@ public class QuerydslBasicTest {
   @Test
   public void dynamicQuery_BooleanBuilder() {
     String usernameParam = "member1";
-    Integer ageParam = null;
+    Integer ageParam = 10;
 
     List<Member> result = searchMember1(usernameParam, ageParam);
     assertThat(result).hasSize(1);
@@ -606,5 +608,48 @@ public class QuerydslBasicTest {
         .from(member)
         .where(builder)
         .fetch();
+  }
+
+  @Test
+  public void dynamicQuery_WhereParam() {
+    String usernameParam = "member1";
+    Integer ageParam = 10;
+
+    List<Member> result = searchMember2(usernameParam, ageParam);
+    assertThat(result).hasSize(1);
+  }
+
+  // 영한님은 boolean builder 보다 이 방식을 더 선호함
+  // 왜?
+  // 1. 쿼리를 단번에 파악 가능(가독성 높아짐)
+  // 2. 메서드 재사용이 가능하다.
+  // 3. 조합 가능. 자바 코드이기 때문에 자유롭게 조합 가능 (allEq)
+  private List<Member> searchMember2(String usernameCond, Integer ageCond) {
+    return queryFactory
+        .select(member)
+        .from(member)
+        //.where(usernameEq(usernameCond), ageEq(ageCond))
+        .where(allEq(usernameCond, ageCond))
+        .fetch();
+  }
+
+  private List<MemberDto> searchMember3(String usernameCond, Integer ageCond) {
+    return queryFactory
+        .select(new QMemberDto(member.username, member.age))
+        .from(member)
+        .where(allEq(usernameCond, ageCond))
+        .fetch();
+  }
+
+  private BooleanExpression allEq(String usernameCond, Integer ageCond){
+    return usernameEq(usernameCond).and(ageEq(ageCond));
+  }
+
+  private BooleanExpression usernameEq(String usernameCond) {
+    return usernameCond != null ? member.username.eq(usernameCond) : null;
+  }
+
+  private BooleanExpression ageEq(Integer ageCond) {
+    return ageCond != null ? member.age.eq(ageCond) : null;
   }
 }
