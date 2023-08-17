@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static study.querydsl.entity.QMember.member;
 import static study.querydsl.entity.QTeam.team;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.NonUniqueResultException;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
@@ -568,7 +569,7 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void findDtoByQueryProjection(){
+  public void findDtoByQueryProjection() {
     // 장점 : 컴파일 오류로 타입 체크 가능.
     // 단점 : Q파일 생성,
     // Dto가 QueryDsl에 의존성을 갖게됨 @QueryProjection, 그리고 이 Dto는 서비스, 컨트롤러에서도 사용 가능함. -> 순수하지 않은 의존적 설계
@@ -580,5 +581,30 @@ public class QuerydslBasicTest {
     for (MemberDto memberDto : results) {
       System.out.println("memberDto = " + memberDto);
     }
+  }
+
+  @Test
+  public void dynamicQuery_BooleanBuilder() {
+    String usernameParam = "member1";
+    Integer ageParam = null;
+
+    List<Member> result = searchMember1(usernameParam, ageParam);
+    assertThat(result).hasSize(1);
+  }
+
+  private List<Member> searchMember1(String usernameCond, Integer ageCond) {
+    BooleanBuilder builder = new BooleanBuilder();
+    if (usernameCond != null) {
+      builder.and(member.username.eq(usernameCond));
+    }
+    if (ageCond != null) {
+      builder.and(member.age.eq(ageCond));
+    }
+
+    return queryFactory
+        .select(member)
+        .from(member)
+        .where(builder)
+        .fetch();
   }
 }
