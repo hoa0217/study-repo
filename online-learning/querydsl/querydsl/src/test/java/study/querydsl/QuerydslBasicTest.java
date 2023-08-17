@@ -9,6 +9,7 @@ import static study.querydsl.entity.QTeam.team;
 import com.querydsl.core.NonUniqueResultException;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -391,7 +392,7 @@ public class QuerydslBasicTest {
         .fetch();
 
     for (Tuple tuple : result) {
-      System.out.println("tuple = "+tuple);
+      System.out.println("tuple = " + tuple);
     }
 
     // JPQL은 from 절에서 서브쿼리가 불가능하다. 하지만 서브쿼리가 많이 사용되는 형태는 현대적인 형태가 아니다.
@@ -400,5 +401,39 @@ public class QuerydslBasicTest {
     // 한방쿼리보단, 여러번 가져오는게 나올 수도 있다. (책 sql anti patterns)
     // 정말 복잡한 수천줄에 쿼리를 나눠서 가져오면 몇백줄이 될 수 있다.
   }
+
+  @Test
+  public void basicCase() {
+    List<String> result = queryFactory
+        .select(member.age
+            .when(10).then("열살")
+            .when(20).then("스무살")
+            .otherwise("기타"))
+        .from(member)
+        .fetch();
+
+    for (String s : result) {
+      System.out.println("s = " + s);
+    }
+  }
+
+  @Test
+  public void complexCase() {
+    List<String> result = queryFactory
+        .select(new CaseBuilder()
+            .when(member.age.between(0, 20)).then("0~20살")
+            .when(member.age.between(21, 30)).then("21~30살")
+            .otherwise("기타")
+        )
+        .from(member)
+        .fetch();
+
+    for (String s : result) {
+      System.out.println("s = " + s);
+    }
+  }
+
+  // 하지만 db에서 이런.. 작업은 하지말자.
+  // 최소한의 필터링과 grouping만하고 보여주는 용도는 db에서 하지말고 어플리케이션 또는 화면(presentation)에서 하자.
 
 }
