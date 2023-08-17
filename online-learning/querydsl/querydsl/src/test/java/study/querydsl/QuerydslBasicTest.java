@@ -10,7 +10,7 @@ import com.querydsl.core.NonUniqueResultException;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -431,9 +431,34 @@ public class QuerydslBasicTest {
     for (String s : result) {
       System.out.println("s = " + s);
     }
+
+    // 하지만 db에서 이런.. 작업은 하지말자.
+    // 최소한의 필터링과 grouping만하고 보여주는 용도는 db에서 하지말고 어플리케이션 또는 화면(presentation)에서 하자.
   }
 
-  // 하지만 db에서 이런.. 작업은 하지말자.
-  // 최소한의 필터링과 grouping만하고 보여주는 용도는 db에서 하지말고 어플리케이션 또는 화면(presentation)에서 하자.
+  @Test
+  public void constant() {
+    List<Tuple> result = queryFactory
+        .select(member.username, Expressions.constant("A"))
+        .from(member)
+        .fetch();
+
+    for (Tuple tuple : result) {
+      System.out.println("tuple = " + tuple);
+    }
+  }
+
+  @Test
+  public void concat() {
+    //username_age
+    List<String> result = queryFactory
+        .select(member.username.concat("_").concat(member.age.stringValue())) // stringValue를 사용할 일이 꽤 많다 (특히 Enum)
+        .from(member)
+        .fetch();
+
+    for (String s : result) {
+      System.out.println("s = " + s);
+    }
+  }
 
 }
