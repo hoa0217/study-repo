@@ -6,15 +6,18 @@ import static study.querydsl.entity.QTeam.team;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.dto.QMemberTeamDto;
+import study.querydsl.entity.Member;
 
 public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
@@ -85,28 +88,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
   @Override
   public Page<MemberTeamDto> searchPageComplex(MemberSearchCondition condition, Pageable pageable) {
-    List<MemberTeamDto> content = getContent(condition, pageable);
-    long total = getCount(condition, pageable);
-
-    return new PageImpl<>(content, pageable, total);
-  }
-
-  private long getCount(MemberSearchCondition condition, Pageable pageable) {
-    return queryFactory
-        .select(member)
-        .from(member)
-        .where(usernameEq(condition.getUsername())
-            , teamNameEq(condition.getTeamName())
-            , ageGoe(condition.getAgeGoe())
-            , ageLoe(condition.getAgeLoe())
-        )
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .fetchCount();
-  }
-
-  private List<MemberTeamDto> getContent(MemberSearchCondition condition, Pageable pageable) {
-    return queryFactory
+    List<MemberTeamDto> content = queryFactory
         .select(new QMemberTeamDto(member.id.as("memberId")
             , member.username
             , member.age
@@ -122,5 +104,22 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .fetch();
+
+    JPAQuery<Member> countQuery = queryFactory
+        .select(member)
+        .from(member)
+        .where(usernameEq(condition.getUsername())
+            , teamNameEq(condition.getTeamName())
+            , ageGoe(condition.getAgeGoe())
+            , ageLoe(condition.getAgeLoe())
+        )
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize());
+
+//    return new PageImpl<>(content, pageable, total);
+    return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetchCount());
+    // count쿼리 생략 가능한 경우 생략해서 처리 : ount 쿼리가 생략 가능한 경우 생략해서 처리
+    // 1. 페이지 시작이면서 컨텐츠 사이즈가 페이지 사이즈보다 작을 때
+    // 2. 마지막 페이지 일 때 (offset + 컨텐츠 사이즈를 더해서 전체 사이즈 구함, 더 정확히는 마지막 페이지 이면서 컨텐츠 사이즈가 페이지 사이즈보다 작을 때)
   }
 }
