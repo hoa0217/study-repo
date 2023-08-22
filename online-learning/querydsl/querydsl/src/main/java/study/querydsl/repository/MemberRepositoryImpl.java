@@ -29,6 +29,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
   @Override
   public List<MemberTeamDto> search(MemberSearchCondition condition) {
+
     return queryFactory
         .select(new QMemberTeamDto(member.id.as("memberId")
             , member.username
@@ -108,6 +109,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     JPAQuery<Member> countQuery = queryFactory
         .select(member)
         .from(member)
+        .leftJoin(member.team, team)
         .where(usernameEq(condition.getUsername())
             , teamNameEq(condition.getTeamName())
             , ageGoe(condition.getAgeGoe())
