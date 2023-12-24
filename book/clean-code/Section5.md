@@ -99,7 +99,7 @@ public class TestConfig {
 
 ```java
 private static void readPreferences() {
-	**InputStream is = null;**
+	InputStream is = null;
 	try {
 		is = new FileInputStream(getPreferencesFile());
 		...
