@@ -11,4 +11,5 @@
 3. <code>/online-learning</code>
    > 강의를 듣고 정리한 내용과 실습을 모았습니다.
    - [ ] [토비의 스프링부트 - 이해와 원리 Section1~6 (임시중단)](./online-learning/helloboot/README.md)
+   - [ ] [스프링 핵심 원리 - 기본편 (진행중)](./online-learning/core/core/README.md)
 
