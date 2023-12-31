@@ -74,8 +74,7 @@ public Money calculatePay(Employee e) throws InvalidEmployeeType{
 4. OCP를 위반한다.
     - 새 직원 유형을 추가하면 코드에 무조건 변경이 일어난다.
 5. 가장 심각한 문제는 위 함수와 구조가 동일한 함수가 무한정 존재한다.
-    - 만약 `isPayday(Employee e, Date date)`, `deliverPay(Employee e, Money pay**)**`와 같은 함수가 필요하다면 계속해서 동일한 switch문을 사용해야한다.
-    - 어떤 직원 유형인지 확인이 필요하기 때문에.
+    - 만약 `isPayday(Employee e, Date date)`, `deliverPay(Employee e, Money pay)`와 같은 함수가 필요하다면 어떤 직원 유형인지 확인이 필요하기 때문에 계속해서 동일한 switch문을 사용해야한다.
 
 #### 해결책
 ```java
