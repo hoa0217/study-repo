@@ -1,7 +1,5 @@
 # 2장 의미 있는 이름
 
-## 이름을 잘짓는 규칙
-
 ### 의도를 분명히 밝혀라
 
 변수(혹은 함수, 클래스)명에 존재이유, 수행기능, 사용방법을 나타내야한다. 따로 주석이 필요하다면 의도를 드러내지 못한 것.
@@ -39,6 +37,7 @@ static final int STATUS_VALUE = 0;
 static final int FLAGGED = 4;
 
 ...
+
 public List<int[]> getFlaggedCells(){
     List<int[]> flaggedCells = new ArrayList<>();
     for(int[] cell: gameBoard){
@@ -54,12 +53,10 @@ public List<int[]> getFlaggedCells(){
 
 ```java
 
-public class Cell{
-  static final int FLAGGED = 4;
+public class Cell{ 
+    static final int FLAGGED = 4;
     private int status;
     private int power;
-
-...
 
     public boolean isFlagged(){
         return this.status == FLAGGED;
@@ -118,17 +115,17 @@ final int MAX_CLASSES_PER_STUDENT = 7
 
 ### 인코딩을 피하라
 
-**변수(함수 또는 클래스) 이름에 타입을 작성하지마라.**
+#### 변수(함수 또는 클래스) 이름에 타입을 작성하지마라.
 
 - 컴파일러가 타입을 기억하고 강제하며 IDE는 컴파일하지 않고도 타입오류를 감지할 수 있다.
 - 또한 이름때문에 타입을 바꾸기가 어려워지며 가독성이 나쁘다.
 
-**멤버 변수 접두어**
+#### 멤버 변수 접두어
 
 - 멤버 변수에 m_이라는 접두어를 붙일 필요도 없다.
 - 멤버 변수를 다른 색상으로 보여주는 IDE를 사용해라.
 
-**인터페이스 이름에 접두어를 붙이지 마라**
+#### 인터페이스 이름에 접두어를 붙이지 마라
 
 - 접두어 IShapeFactory와 같은 이름은 과도한 정보를 제공한다.
 - 클라이언트에게 기능을 제공하는 서버입장에서 인터페이스라는 것을 알리고 싶지 않을 수 있다.
@@ -155,12 +152,11 @@ final int MAX_CLASSES_PER_STUDENT = 7
 - 접근자, 변경자, 조건자는JavaBean규약에 따라 get, set, is를 붙인다.
 
     > JavaBean 규약
-    >
     > 1. 자바빈은 defulat 패키지가 아닌 하위에 있는 클래스
     > 2. 기본 생성자가 존재해야함
     > 3. 멤버변수는 모두 private으로 선언
     > 4. getter/setter를 통해서 멤버변수 접근 (public 선언)
-       >     1. 하지만 무분별한 setter 사용은 지양합시다.
+    >   1. 하지만 무분별한 setter 사용은 지양합시다.
     > 5. `Serializable`을 implement 하여 직렬화 가능 (선택사항)
     >
     > **참고** : [[JAVAEE] 자바빈(JavaBean) 이란? 자바빈 규약에 대해](https://dololak.tistory.com/133)
@@ -221,7 +217,5 @@ class Address{
 - accountAddress, customerAddress ➡️ Address 인스턴스 변수명 O 클래스 명 X
 - PostalAddress, MAC, URI ➡️ Address 클래스 명 O
     - 주소를 포트 주소, Mac 주소, 웹 주소로 구분하여 의미가 분명해진다.
-
-## 결론
-
-> 위 규칙뿐만 아니라 클린하고 객체지향적인 코딩이 하고 싶다면, [객체지향 생활 체조 9가지 원칙](https://catsbi.oopy.io/bf003ff6-2912-4714-8ac2-44eeb7becc93) 을 추천합니다.
+  
+> 내 생각: 위 규칙뿐만 아니라 클린하고 객체지향적인 코딩이 하고 싶다면, [객체지향 생활 체조 9가지 원칙](https://catsbi.oopy.io/bf003ff6-2912-4714-8ac2-44eeb7becc93) 을 추천합니다.
