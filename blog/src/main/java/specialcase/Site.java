@@ -1,8 +1,10 @@
 package specialcase;
 
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Site {
 
     private Customer customer;

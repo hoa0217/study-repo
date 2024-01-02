@@ -22,8 +22,4 @@ public class Client {
         int weeksDelinquent = aCustomer.getPaymentHistory().getWeekDelinquentInLastYear();
         System.out.println("weeksDelinquent = " + weeksDelinquent);
     }
-
-    public static boolean isUnknown(Customer customer){
-        return customer.isUnKnown();
-    }
 }
