@@ -25,3 +25,6 @@
 ### 섹션4 : 스프링 컨테이너와 스프링 빈
 #### [SpringContainer](Section4/SpringContainer.md)
 #### [BeanDefinition](Section4/BeanDefinition.md)
+
+### 섹션5 : 싱글톤 컨테이너
+#### [Singleton](Section5/Singleton.md)
