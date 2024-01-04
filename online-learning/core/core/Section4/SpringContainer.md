@@ -1,4 +1,4 @@
-# 스프링컨테이너 생성
+# 스프링컨테이너
 
 ```java
 ApplicationContext applicationContext = 
@@ -39,6 +39,31 @@ ApplicationContext applicationContext =
 <img width="700" alt="스크린샷 2024-01-03 오후 12 22 28" src="https://github.com/hoa0217/study-repo/assets/48192141/63ffb0a9-7299-4173-94c6-424856cbe9cd">
 
 - 설정 정보를 활용해, 빈을 생성하고 의존관계를 주입(DI)한다.
+
+### BeanFactory와 ApplicationContext
+
+```
+BeanFactory(interface) ⬅️ ApplicationContext(interface) ⬅️ AnnotationConfigApplicationContext
+```
+
+BeanFactory
+- 스프링 컨테이너 최상위 인터페이스
+- 스프링 빈을 관리하고 조회하는 역할 담당 `getBean()`
+
+ApplicationContext
+- BeanFactory 기능 상속 + 부가 기능 제공
+> Beanfactory는 직접사용할 일이 없고, ApplicationContext를 사용한다.
+
+ApplicationContext 부가기능
+
+<img width="700" alt="스크린샷 2024-01-04 오후 10 42 35" src="https://github.com/hoa0217/study-repo/assets/48192141/7a67f16c-b664-4c3b-9c8e-0c5e8af67278">
+
+- MessageSource : 국제화 기능
+- EnvironmentCapable : 환경변수 (로컬, 개발, 운영 등 환경을 구분해서 처리)
+- ApplicationEventPublisher : 어플리케이션 이벤트 (이벤트 발행 및 구독)
+- ResourceLoader : 리소스 조회
+
+
 
 
 
