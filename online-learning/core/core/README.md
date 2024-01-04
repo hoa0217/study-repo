@@ -19,7 +19,7 @@
 #### [객체 지향 설계와 스프링](Section1/OOP&Spring.md)
 
 ### 섹션3 : 객체 지향 원리 적용
-#### [AppConfig 등장](Section3/AppConfig.md)
+#### [AppConfig 등장](Section3/AppConfigMD.md)
 #### [IoC,DI 그리고 컨테이너](Section3/IoC,DI,Container.md)
 
 ### 섹션4 : 스프링 컨테이너와 스프링 빈

@@ -2,13 +2,19 @@ package hello.core.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hello.core.AppConfig;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class MemberServiceTest {
 
-    @Autowired
     private MemberService memberService;
+
+    @BeforeEach
+    public void beforeEach() {
+        AppConfig appConfig = new AppConfig();
+        memberService = appConfig.memberService();
+    }
 
     @Test
     public void join() {

@@ -11,7 +11,7 @@ import hello.core.order.OrderServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// 스프링 컨테이너 설정정보
+// 스프링 컨테이너 설정정보: 팩터리 메서드 형식
 @Configuration
 public class AppConfig {
 
