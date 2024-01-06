@@ -132,7 +132,7 @@ final int MAX_CLASSES_PER_STUDENT = 7
 - 인터페이스는 ShapeFactory로 구현체는 CircleFactory, TriangleFactory와 같이 구체적으로 작성하자.
 
 > 책에서는 ShapeFactoryImpl, CshapeFactory를 추천하지만 구체적으로 작성하는게 더 좋아보임.
-물론 **구현체가 하나일 경우 Impl로 작성하는 이유도 있긴함.**   
+물론 **구현체가 하나일 경우 Impl로 작성해도 괜찮다.**   
 > **참고** : [주니어 개발자의 클린 아키텍처 맛보기 | 우아한형제들 기술블로그](https://techblog.woowahan.com/2647/)
 
 

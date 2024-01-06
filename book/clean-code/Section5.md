@@ -96,10 +96,10 @@ public class TestConfig {
 
 #### 변수 선언
 변수는 사용하는 위치에 최대한 가까이 선언한다.
-
+- 지역 변수는 각 함수 맨 처음에 선언
 ```java
 private static void readPreferences() {
-	InputStream is = null;
+    InputStream is = null;
 	try {
 		is = new FileInputStream(getPreferencesFile());
 		...
@@ -109,11 +109,11 @@ private static void readPreferences() {
 	}
 }
 ```
-
+- loop 제어변수는 loop문 내부에 선언
 ```java
 public int countTestCases() {
 	int count = 0;
-	for (**Test each** : tests){
+	for (Test each : tests){
 		...
 	}
 	return count;
@@ -121,16 +121,15 @@ public int countTestCases() {
 ```
 
 #### 인스턴스 변수
-- 클래스 맨 처음에 선언한다.
-- **변수 간 세로로 거리를 두지 않는다.**
-- 잘 설계한 클래스는 **클래스 메서드가 인스턴스 변수를 사용하기 때문이다.**
+- 클래스 맨 처음에 선언하며, 변수 간 세로로 거리를 두지 않는다.
+  - 잘 설계한 클래스는 **클래스 메서드가 인스턴스 변수를 사용하기 때문이다.**
 - 잘 알려진 위치에 인스턴스 변수를 모은다는 사실이 중요하다.
 > C++은 맨 마지막, Java는 맨 앞에 선언한다.
 
 #### 종속 함수
 - 한 함수가 다른 함수를 호출한다면 두 함수는 세로로 가까이 배치한다.
 - 가능하다면 **호출하는 함수를 호출되는 함수보다 먼저 배치한다.**
-- 이 규칙을 일관적으로 적용한다면, 독자는 방금 호출한 함수가 잠시 후 정의될것이라 예측한다.
+- 이 규칙을 일관적으로 적용한다면, 독자는 방금 호출한 함수가 잠시 후 정의될것이라 예측한다. (고차원 ➡️ 저차원)
 
 ```java
 public class PageClass {
@@ -165,7 +164,7 @@ public class PageClass {
 	}
 }
 ```
-- "FrontPage" 를 상수로 사용하는 방법도 있다.
+- defaultPageName인 "FrontPage" 를 상수로 사용하는 방법도 있다.
 - 하지만, 기대와 달리 **잘 알려진 상수가 적절하지 않은 저차원 함수에 묻힌다.**
 - **상수를 알아야 마땅한 함수(`makePage`)에서 실제로 사용하는 함수(`getPage`)로 상수를 넘겨주는 방법이 더 좋다.**
 
@@ -222,7 +221,7 @@ int lineSize = line.length();
 // 함수와 인수는 밀접하기 때문에 함수이름과 괄호사이에 공백을 넣지 않음.
 recordWidestLine(lineSize);
 
-// 괄호한 인수는 공백으로 분리함. 쉼표를 강조해 인수가 별개라는 사실을 보여주기 위해.
+// 괄호안 인수는 공백으로 분리함. 쉼표를 강조해 인수가 별개라는 사실을 보여주기 위해.
 addLine(lineSize, lineCount);
 ```
 
@@ -260,3 +259,100 @@ public String render() throws Exception {
 - 좋은 소프트웨어는 읽기 쉬운 문서로 이루어져야한다.
 - 스타일은 일관적이고 매끄러워야한다.
 - **한 소스 파일에 봤던 형식이 다른 소스 파일에도 쓰이리라는 신뢰감을 줘야한다.**
+
+---
+
+### 밥아저씨 형식규칙
+
+```java
+public class CodeAnalyzer implements JavaFileAnalysis { 
+    private int lineCount;
+    private int maxLineWidth;
+    private int widestLineNumber;
+    private LineWidthHistogram lineWidthHistogram; 
+    private int totalChars;
+
+    public CodeAnalyzer() {
+        lineWidthHistogram = new LineWidthHistogram();
+    }
+
+    public static List<File> findJavaFiles(File parentDirectory) { 
+        List<File> files = new ArrayList<File>(); 
+        findJavaFiles(parentDirectory, files);
+        return files;
+    }
+
+    private static void findJavaFiles(File parentDirectory, List<File> files) {
+        for (File file : parentDirectory.listFiles()) {
+            if (file.getName().endsWith(".java")) 
+                files.add(file);
+            else if (file.isDirectory()) 
+                findJavaFiles(file, files);
+        } 
+    }
+
+    public void analyzeFile(File javaFile) throws Exception { 
+        BufferedReader br = new BufferedReader(new FileReader(javaFile)); 
+        String line;
+        while ((line = br.readLine()) != null)
+            measureLine(line); 
+    }
+
+    private void measureLine(String line) { 
+        lineCount++;
+        int lineSize = line.length();
+        totalChars += lineSize; 
+        lineWidthHistogram.addLine(lineSize, lineCount);
+        recordWidestLine(lineSize);
+    }
+
+    private void recordWidestLine(int lineSize) { 
+        if (lineSize > maxLineWidth) {
+            maxLineWidth = lineSize;
+            widestLineNumber = lineCount; 
+        }
+    }
+
+    public int getLineCount() { 
+        return lineCount;
+    }
+
+    public int getMaxLineWidth() { 
+        return maxLineWidth;
+    }
+
+    public int getWidestLineNumber() { 
+        return widestLineNumber;
+    }
+
+    public LineWidthHistogram getLineWidthHistogram() {
+        return lineWidthHistogram;
+    }
+
+    public double getMeanLineWidth() { 
+        return (double)totalChars/lineCount;
+    }
+
+    public int getMedianLineWidth() {
+        Integer[] sortedWidths = getSortedWidths(); 
+        int cumulativeLineCount = 0;
+        for (int width : sortedWidths) {
+            cumulativeLineCount += lineCountForWidth(width); 
+            if (cumulativeLineCount > lineCount/2)
+                return width;
+        }
+        throw new Error("Cannot get here"); 
+    }
+
+    private int lineCountForWidth(int width) {
+        return lineWidthHistogram.getLinesforWidth(width).size();
+    }
+
+    private Integer[] getSortedWidths() {
+        Set<Integer> widths = lineWidthHistogram.getWidths(); 
+        Integer[] sortedWidths = (widths.toArray(new Integer[0])); 
+        Arrays.sort(sortedWidths);
+        return sortedWidths;
+    } 
+}
+```
