@@ -1,6 +1,8 @@
 package hello.core.beandefinition;
 
 import hello.core.AppConfig;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -25,6 +27,20 @@ public class BeanDefinitionTest {
                 System.out.println("beanDefinitionName = " + beanDefinitionName);
                 System.out.println("beanDefinition = " + beanDefinition);
             }
+        }
+    }
+
+    @Test
+    void test(){
+        try{
+            System.out.println("안녕하세요");
+            throw new NullPointerException("npe발생!");
+        }
+        catch (IndexOutOfBoundsException e){
+            System.out.println("exception 발생");
+        }
+        finally {
+            System.out.println("끝");
         }
     }
 
