@@ -150,7 +150,8 @@ public void c() throws IOException {
 - Unchecked Exception : `RuntimeException`을 상속하는 예외. 컴파일러가 예외처리를 강제(확인)하지 않는 예외.
   - 프로그래머의 실수에 의해 발생될 수 있는 예외들
   - ex) 배열의 범위를 벗어남(`IndexOutOfBoundsException`), null인 참조변수의 멤버를 호출(`NullPointException`)
-> Checked Exception은 Java에만 있다. 다른 언어(C#, C++, Python 등)들에는 없다.
+> Checked Exception은 Java에만 있다. 다른 언어(C#, C++, Python 등)들에는 없다.   
+> 참고 : [Checked Exception, Unchecked Exception 그리고 예외 처리](https://velog.io/@gjwjdghk123/Checked-Exception-Unchecked-Exception-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%98%88%EC%99%B8-%EC%B2%98%EB%A6%AC)
 
 ### 예외에 의미를 제공하라
 - 자바에선 모든 예외에 **호출 스택**을 제공하지만 실패한 코드의 의도를 파악하려면 호출 스택만으로 부족하다.
@@ -261,7 +262,8 @@ public class PerDiemMealExpenses implements MealExpenses {
 - 특수 사례 패턴 : 클래스를 만들거나 객체를 조작해 특수 사례를 처리하는 방식
 - 객체가 예외적인 상황을 캡슐화해서 처리하므로, 클라이언트 코드는 이를 처리할 필요가 없다.
 
-> 특수 사례 패턴은 마틴파울러 `리팩토링` 책에도 소개된 패턴 (정리 필요)
+> 특수 사례 패턴은 마틴파울러 `리팩토링` 책에도 소개된 패턴   
+> 참고 : [특이 케이스 패턴(Special Case Pattern)](https://velog.io/@gjwjdghk123/%ED%8A%B9%EC%9D%B4-%EC%BC%80%EC%9D%B4%EC%8A%A4-%ED%8C%A8%ED%84%B4)
 
 ### null을 반환하지 마라
 - null을 반환하는 습관은 오류를 유발할 수 있다.
