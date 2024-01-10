@@ -10,3 +10,4 @@
 ### [5장 형식맞추기](Section5.md)
 ### [6장 객체와 자료 구조](Section6.md)
 ### [7장 오류처리](Section7.md)
+### [8장 경계](Section8.md)
