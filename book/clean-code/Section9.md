@@ -110,7 +110,7 @@ public void turnOnLoTempAlarmAtThreshold() throws Exception {
 - 하지만 assertEquals에 이상한 문자열`HBchL`이 존재한다.
   - 대문자는 켜짐, 소문자는 꺼짐을 뜻한다.
   - 문자는 {heater, blower, cooler, hi-temp-alarm, lo-temp-alarm} 순서이다.
-- 비록 이 문자열은 [그릇된 정보를 피하라](Section2.md)라는 규칙의 위반에 가깝지만 여기서는 적절하다.
+- 비록 이 문자열은 [그릇된 정보를 피하라](Section2.md#그릇된-정보를-피하라)라는 규칙의 위반에 가깝지만 여기서는 적절하다.
 - 의미만 안다면 눈길이 문자열을 따라 결과를 재빠르게 판단할 수 있다.
 
 ```java
@@ -150,6 +150,7 @@ public void testGetPageHierarchyAsXml() throws Exception {
 }
 ```
 ```java
+// 리팩토링 후
 public void testGetPageHierarchyAsXml() throws Exception { 
   givenPages("PageOne", "PageOne.ChildOne", "PageTwo");
   
@@ -173,12 +174,30 @@ public void testGetPageHierarchyHasRightTags() throws Exception {
 - 이때, TEMPLATE METHOD 패턴을 사용하여 중복을 제거할 수 있다.
   - given-when은 부모 클래스에 두고 then 은 자식클래스에 두면된다.
 - 아니면 `@Before` 함수에 given-when을 넣고 `@Test`에 then을 넣어도된다.
+```java
+@BeforeEach
+public void before() throws Exception {
+    givenPages("PageOne", "PageOne.ChildOne", "PageTwo");
+  
+    whenRequestIsIssued("root", "type:pages");
+}
+
+@Test
+public void testGetPageHierarchyAsXml() {
+    thenResponseShouldBeXML();
+}
+
+@Test
+public void testGetPageHierarchyHasRightTags() {
+    thenResponseShouldContain(
+        "<name>PageOne</name>", "<name>PageTwo</name>", "<name>ChildOne</name>"
+    );
+}
+```
 - 하지만 배꼽이 더 커지므로 assert문을 여럿 사용하는 편이 좋다고 생각한다. (저자생각)
 
 > *단일 assert문이라는 규칙은 훌륭한 지침이지만, 때로는 주저 없이 함수 하나에 여러 assert문을 넣기도 한다.*
 > *단지 assert문 개수는 최대한 줄여야 좋다는 생각이다.*
-
-> 템플릿 메서드 패턴 공부 필요
 
 #### 테스트 당 개념 하나
 > *어쩌면 테스트 함수마다 한 개념만 테스트 하라 는 규칙이 더 낫겠다.*
