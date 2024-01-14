@@ -24,7 +24,7 @@ Sensor s = sensor.get(sensorId);
 - 하지만 1번은 해결하지 못한다.
 
 1번 해결법 : 경계 인터페이스를 **클래스** 안으로 숨긴다. => 일급 컬렉션 (First Class Collection)
-> 일급 컬릭션 : Collection을 Wrapping하면서, 그 외 다른 멤버 변수가 없는 상태   
+> 일급 컬렉션 : Collection을 Wrapping하면서, 그 외 다른 멤버 변수가 없는 상태   
 > 출처 : [일급 컬렉션 (First Class Collection)의 소개와 써야할 이유](https://jojoldu.tistory.com/412)
 ```java
 public class Sensors {

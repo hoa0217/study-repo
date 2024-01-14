@@ -29,19 +29,4 @@ public class BeanDefinitionTest {
             }
         }
     }
-
-    @Test
-    void test(){
-        try{
-            System.out.println("안녕하세요");
-            throw new NullPointerException("npe발생!");
-        }
-        catch (IndexOutOfBoundsException e){
-            System.out.println("exception 발생");
-        }
-        finally {
-            System.out.println("끝");
-        }
-    }
-
 }
