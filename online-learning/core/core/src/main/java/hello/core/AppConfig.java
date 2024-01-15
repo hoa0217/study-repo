@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 // 스프링 컨테이너 설정정보: 팩터리 메서드 형식
- @Configuration
+@Configuration
 public class AppConfig {
 
     // Bean으로 등록된 객체를 스프링 컨테이너에서 관리
