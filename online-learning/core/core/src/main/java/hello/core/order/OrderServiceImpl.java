@@ -3,7 +3,10 @@ package hello.core.order;
 import hello.core.discount.DiscountPolicy;
 import hello.core.member.Member;
 import hello.core.member.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class OrderServiceImpl implements OrderService {
 
     private final MemberRepository memberRepository;
@@ -11,6 +14,7 @@ public class OrderServiceImpl implements OrderService {
 
     // 의존관계에 대한 고민은 외부에 맡기고 실행에만 집중.
     // 의존관계 주입(Dependency Injection)
+    @Autowired
     public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
 
         this.memberRepository = memberRepository;
