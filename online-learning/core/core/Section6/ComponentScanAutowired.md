@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
 
 - 생성자에 `@AutoWired`를 지정하면, 스프링 컨테이너가 자동으로 해당 빈을 찾아서 주입한다.
 - 기본조회는 타입이 같은 빈을 찾아서 주입힌다. `getBean(MemberRepository.class)`
-- 만약 타입이 겹치는 빈이 존재한다면? **에러발생.**
+  - 만약 타입이 겹치는 빈이 존재한다면? **에러발생.**
 
 ### 권장 방법
 ```java

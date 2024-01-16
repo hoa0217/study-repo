@@ -36,3 +36,4 @@
 #### [컴포넌트 스캔과 의존관계 자동 주입](Section6/ComponentScanAutowired.md)
 #### [컴포넌트 스캔 기본 대상](Section6/ScanTarget.md)
 #### [필터](Section6/Filter.md)
+#### [중복 등록과 충돌](Section6/Conflict.md)
