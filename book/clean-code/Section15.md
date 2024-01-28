@@ -1,6 +1,6 @@
 # 15장 JUnit 들여다보기
-JUnit 프레임워크의 `ComparisonCompactor` 모듈을 리팩토링하는 과정을 보여줍니다. 주요 리팩토링요소를 간추렸습니다.
-> JUnit 저자가 아주 많습니다. 하지만 시작은 켄트백과 에릭 감마가 비행기를 타고가다가 만들었습니다. 
+해당장은 JUnit 프레임워크의 `ComparisonCompactor` 모듈을 리팩토링하는 과정을 보여준다.
+> JUnit 저자가 아주 많다. 하지만 시작은 켄트백과 에릭 감마가 비행기를 타고가다가 만들었다. 
 
 ### 리팩토링 전 원본코드
 ```java
@@ -120,7 +120,7 @@ private boolean shouldNotCompact() {
 
 ### 변수명을 명확하게 변경
 - 함수에서 멤버 변수와 이름이 똑같은 변수를 사용하는 이유는 무엇일까?
-- 서로 다른의미라면 명확하게 붙여야한다.
+- 서로 다른 의미라면 명확하게 붙여야한다.
 
 ```java
 // Before
@@ -134,7 +134,7 @@ String compactActual = compactString(actual);
 
 ### 부정문을 긍정문으로
 - 부정문은 긍정문보다 이해하기 어렵다.
-- 따라서 첫문장 if를 정증으로 만들어 조건문을 반전한다.
+- 따라서 첫문장 if를 긍정문으로 만들어 조건문을 반전한다.
 
 ```java
 // Before
@@ -238,7 +238,7 @@ private void compactExpectedAndActual() {
 ```
 
 - 하지만 `prefixIndex`가 필요한 이유는 드러내지 못한다.
-- 다른 프로그래머가 되돌려놓을 수도 있다.
+- 다른 프로그래머가 순서를 되돌려놓을 수도 있다.
 - 따라서 `findCommonPrefix`와 `findCommonSuffix`를 하나의 함수로 합치고 `findCommonPrefix`를 가장 먼저 호출하도록한다.
 - 그러면 두 함수를 호출하는 순서가 훨씬 더 분명해진다.
 
