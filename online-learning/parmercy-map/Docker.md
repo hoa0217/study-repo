@@ -45,12 +45,45 @@
 - `ENV` : 환경 변수 지정
 - `ENTRYPOINT` : 컨테이너가 실행되었을 때 항상 실행되어야하는 커맨드 지정
 
+> 기본적으로 docker 컨테이너 시간은 UTC+0으로 설정되어있이때문에 한국시간(Asia/Seoul)으로 변경해야함.
+
 ## 도커 컴포즈란?
 - Docker Compose란 **멀티컨테이너 도커 어플리케이션**을 정의하고 실행하는 도구
 - Application, Database, Redis, Nginx 등 각 독립적인 컨테이너로 관리한다고 했을 때, 다중 컨테이너 라이프 사이클을 어떻게 관리해야할까?
 - 여러개의 도커 컨테이너로 부터 이루어진 서비스를 구축 및 네트워크 연결, 실행순서를 자동으로 관리
 - docker-compose.yml 파일을 작성하여 1회 실행하는 것으로 설정된 모든 컨테이너를 실행
 
+![스크린샷 2024-02-29 오전 1 14 07](https://github.com/hoa0217/study-repo/assets/48192141/24cce0ce-c3a7-48fc-9b33-c8d3018c313e)
+
+> docker 버전에 맞게 compose 버전을 명시하면된다. https://docs.docker.com/compose/compose-file/compose-versioning/
 
 
+- .env 파일은 docker-compose 빌드 시 자동으로 환경변수가 주입된다.
+```yaml
+version: "3.8"
+services:
+  pharmacy-recommendation-redis:
+    container_name: pharmacy-recommendation-redis
+    build:
+      dockerfile: Dockerfile
+      context: ./redis
+    image: jeonghwaheo/pharmacy-recommendation-redis
+    ports:
+      - "6379:6379"
+  pharmacy-recommendation-database:
+    container_name: pharmacy-recommendation-database
+    build:
+      dockerfile: Dockerfile
+      context: ./database
+    image: jeonghwaheo/pharmacy-recommendation-database
+    environment:
+      - MARIADB_DATABASE=pharmacy-recommendation
+      - MARIADB_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - ./database/config:/etc/mysql/conf.d # 한글깨짐현상으로 해당 config volume 연결
+    ports:
+      - "3306:3306"
+```
+
+> .env파일은 git에 올리면 안됨.
 
