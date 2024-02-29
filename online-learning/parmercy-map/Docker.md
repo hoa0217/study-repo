@@ -87,3 +87,11 @@ services:
 
 > .env파일은 git에 올리면 안됨.
 
+실행
+```bash
+docker-compose -f docker-compose-local.yml up
+```
+중지 및 컨테이너 정리
+```bash
+docker-compose -f docker-compose-local.yml down
+```
