@@ -1,4 +1,5 @@
 plugins {
+	id 'groovy'
 	id 'java'
 	id 'org.springframework.boot' version '2.6.7'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
@@ -33,6 +34,11 @@ dependencies {
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	testImplementation('org.spockframework:spock-core:2.1-groovy-3.0')
+	testImplementation('org.spockframework:spock-spring:2.1-groovy-3.0') // 스프링과 같이 사용하기 위해
+
+	testImplementation('net.bytebuddy:byte-buddy:1.9.3') // 런타임에 클래스 기반 mock을 만들기 위해서 필요
 }
 
 tasks.named('test') {
