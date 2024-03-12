@@ -6,8 +6,8 @@
 
 - 토비님은 **sdkman**을 추천
 - sdkman 설치방법
-    1. `curl -s "[https://get.sdkman.io](https://get.sdkman.io/)" | bash`
-    2. `source "$HOME/.sdkman/bin/sdkman-init.sh"`
+    1. `curl -s https://get.sdkman.io | bash`
+    2. `source $HOME/.sdkman/bin/sdkman-init.sh`
     3. `sdk version`
     
         <img src="img/Section2/1.14.14.png" width="80%">
