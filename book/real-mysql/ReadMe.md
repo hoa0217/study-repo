@@ -7,5 +7,6 @@
     - MyISAM 스토리지 엔진
 > 핸들러 API를 만족하면 누구든 스토리지 엔진을 구현하여 MySQL 서버에 추가하여 사용할 수 있다.
 
-### [4.1 MySQL 엔진 아키텍처](Section4.md)
+### [4.1 MySQL 엔진 아키텍처](Section4-1)
 
+### [4.2 InnoDB 스토리지 엔진 아키텍처](Section4-2)
