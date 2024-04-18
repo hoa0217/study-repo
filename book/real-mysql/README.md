@@ -1,6 +1,6 @@
 # [Real MySQL 8.0](https://www.yes24.com/Product/Goods/103415627)
 
-![image](https://github.com/hoa0217/study-repo/assets/48192141/19d77867-8882-47b3-a2ce-60a17b00cf86)
+<img src="https://github.com/hoa0217/study-repo/assets/48192141/19d77867-8882-47b3-a2ce-60a17b00cf86" width="500">
 
 ## Chapter4. 아키텍처
 - MySQL 엔진: 사람 머리
