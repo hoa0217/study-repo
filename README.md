@@ -8,6 +8,7 @@
    - [x] [스프링 입문을 위한 자바 객체 지향의 원리와 이해 Section1~5 (완료)](./book/oop-for-springintro/README.md)
    - [x] [클린 소프트웨어 SOLID Part (완료)](./book/clean-software/README.md)
    - [x] [Clean Code 클린 코드 : 애자일 소프트웨어 장인 정신 (완료)](./book/clean-code/README.md)
+   - [ ] [Real MySQL 8.0 1권](./book/real-mysql/README.md)
 3. <code>/online-learning</code>
    > 강의를 듣고 정리한 내용과 실습을 모았습니다.
    - [ ] [토비의 스프링부트 - 이해와 원리 Section1~6 (임시중단)](./online-learning/helloboot/README.md)
