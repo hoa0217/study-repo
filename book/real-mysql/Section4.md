@@ -380,7 +380,7 @@ MySQL서버의 CPU가 제한된 개수의 스레드 처리에만 집중할 수 �
 - 하지만 파일 기반의 메타데이터는 생성/변경 시 트랜잭셕을 지원하지 않기 때문에 생성/변경 시 서버가 비정상적으로 종료되면 일관되지 않은 상태로 남는 문제가 있었다.
 - 이를 DB나 테이블이 깨졌다라고 표현한다.
 
-#### 시스템 테이블
+#### InnoDB 시스템 테이블
 - MySQL8.0부터 메타 데이터를 전부 InnoDB의 테이블로 저장하도록 개선했다. 
 - MySQL 서버가 작동하는데 기본적으로 필요한 테이블을 묶어 **시스템 테이블**이라고 한다.
   - ex) 사용자 인증과 권한에 관련된 테이블 
@@ -422,3 +422,7 @@ ERROR 1146 (42S02): Table 'mysql.tables' doesn't exist
 > EROR 3554 (HY000): Access to data dictionary table 'mysql. tables' is rejected.
 > ```
 
+#### InnoDB외 스토리지 엔진
+- InnoDB외 MyISAM, CSV 등의 스토리지 엔진을 사용하는 테이블들은 SDI(Serialized Dictionary Information)파일을 사용한다.
+- SDI는 기존에 *.FRM 파일과 동일한 역할을 한다.
+- SDI는 이름 그대로 직렬화를 위한 포맷이므로, InnoDB 테이블 구조도 SDI로 변환할 수 있다.
