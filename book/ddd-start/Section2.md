@@ -101,3 +101,158 @@ public class CalculateDiscountService() {
 이처럼 겉으로는 인프라스트럭처 기술에 직접적 의존을 하지 않은 것처럼 보여도 실제론 Drools에 완전히 의존하고 있다.
 
 위 문제를 해결하려면 정답은 **DIP**에 있다.
+
+## 2.3 DIP
+
+가격 할인 계산을 하려면, 왼쪽과 같이 고객 정보를 구해야하고 구한 고객 정보와 주문정보를 이용해서 룰을 실행해야한다.
+
+<img width="500" alt="스크린샷 2024-05-05 오후 3 53 27" src="https://github.com/f-lab-edu/modoospace/assets/48192141/07e7d298-a09d-4227-bc84-d8540af58efc">
+
+- 고수준 모듈: 의미있는 단일 기능을 제공하는 모듈 (ex CalculateDiscountService)
+  - 고수준 모듈의 기능을 구현하려면 여러 하위 기능이 필요하다.
+  - ex) 고객정보 구하기, 룰 실행
+- 저수준 모듈: 하위 기능을 실제로 구현한 모듈
+  - ex) JPA로 고객정보 읽어오는 모듈, Drools로 룰 실행하는 모듈
+
+고수준 모듈이 제대로 동작려면 저수준 모듈을 사용해야하지만, 구현 변경과 테스트가 어렵다는 문제가 발생한다.
+
+DIP는 문제 해결을 위해 저수준 모듈이 고수준 모듈에 의존하도록 바꾼다.
+
+즉, 고수준을 구현하기 위해 **저수준이 의존하는 고수준**을 사용하게 하는 것이다. 비밀은 "추상화"한 인터페이스에 있다.
+
+#### 적용 예시
+```java
+public interface RuleDiscounter {
+    Money applyRules(Cunstomer customer, List<OrderLine> orderLines);
+}
+```
+```java
+public class CalculateDiscountService {
+    private RuleDiscounter ruleDiscounter;
+
+    public CalculateDiscountService(RuleDiscounter ruleDiscounter) {
+      this.ruleDiscounter = ruleDiscounter;
+    }
+  
+    public Money calculateDiscount(List<OrderLine> orderLines, String customerId) {
+          ...
+          retun ruleDiscounter.applyRules(customer, orderLines);
+    }
+      ...
+}
+```
+
+- 이제 응용계층은 인프라스트럭처에 의존하는 코드가 없다. 단지 추상화된 RuleDiscounter가 룰을 적용한다는 사실만 알뿐이다.
+- 실제 RuleDiscounter 구현체는 생성자를 통해 전달받는다.
+
+<img width="500" alt="스크린샷 2024-05-05 오후 4 32 31" src="https://github.com/f-lab-edu/modoospace/assets/48192141/fc0e1ea8-6838-4bc8-9562-e4b513630531">
+
+- RuleDiscounter는 '룰을 이용한 할인 금액 계산'을 추상화한 고수준 모듈이다.
+- 그리고 이를 구현한 DroolsRuleDiscounter는 고수준의 하위 기능을 구현한 것이므로 저수준 모듈에 속한다.
+
+<img width="500" alt="스크린샷 2024-05-05 오후 4 35 07" src="https://github.com/f-lab-edu/modoospace/assets/48192141/853dc53b-9353-4a4b-9898-b1bceeeb3594">
+
+- DIP를 적용하면 위와 같이 저수준 모듈이 고수준 모듈에 의존하게 된다.
+- 즉, 고수준이 저수준을 사용하기 위해선 고수준이 저수준을 의존해야하는 형태가 된다.
+  - 고수준 -> 저수준 ➡️ 고수준 -> 고수준(인터페이스) <- 저수준
+- 따라서 반대로 저수준이 고수준 모듈을 의존한다고해서 이를 DIP(Dependency Inversion Principle) 의존역전 원칙이라고 부른다.
+
+#### 구현 기술 교체 문제 해결
+- 더 이상 저수준 모듈에 의존하지 않고 구현을 추상화한 인터페이스에 의존한다.
+- 따라서 실제 사용할 저수준 구현객체는 의존 주입을 이용해 전달받을 수 있다.
+
+```java
+RuleDiscounter ruleDiscounter = new DroolsRuleDiscounter();
+CalculateDiscountService disService = new CalculateDiscountService(ruleDiscounter);
+```
+
+- 구현 기술을 변경하더라도 CalculateDiscountService를 수정할 필요가 없다.
+```java
+RuleDiscounter ruleDiscounter = new SimpleRuleDiscounter();
+CalculateDiscountService disService = new CalculateDiscountService(ruleDiscounter);
+```
+
+만약 스프링과 같은 의존 주입을 지원하는 프레임워크를 사용하면 설정 코드를 수정해 쉽게 구현체를 변경할 수 있다.
+
+#### 테스트 어려움 문제 해결
+```java
+public class CalculateDiscountService {
+    private CustomerRepository customerRepository;
+    private RuleDiscounter ruleDiscounter;
+
+    public CalculateDiscountService(RuleDiscounter ruleDiscounter) {
+      this.ruleDiscounter = ruleDiscounter;
+    }
+  
+    public Money calculateDiscount(List<OrderLine> orderLines, String customerId) {
+          Customer customer = findCustomer(customerId);
+          retun ruleDiscounter.applyRules(customer, orderLines);
+    }
+    
+    private Customer findCustomer(String customerId) {
+        Customer customer = customerRepository.findById(customerId);
+        if(customer == null) throw new NoCustomerException();
+        return customer;
+    }
+    ...
+}
+```
+- CalculateDiscountService가 제대로 동작하는지 테스트 하려면 CustomerRepository, RuleDiscounter 구현 객체가 필요하다.
+- 만약 저수준 모듈을 직접 의존했다면, 해당 모듈이 만들어지기 전까지 테스트를 할 수 없었겠지만 현재는 대역 객체를 사용해 테스트를 진행할 수 있다.
+
+```java
+public class CalculateDiscountserviceTest {
+    
+    @Test
+    public void noCustomer_thenExceptionShouldBeThrown() {
+        // Mock을 이용한 테스트 목적의 대역 객체 생성
+        CustomerRepository stubRepo = mock(CustomerRepository.class);
+        when(stubRepo.findById("noCustId")).thenReturn(null);
+
+        RuleDiscounter stubRule = (cust, lines) -> null;
+        
+        // 대역 객체를 주입 받아 테스트 진행
+        CalculateDiscountservice calDisSvc = new CalculateDiscountservice(stubRepo, stubRule);
+        assertThrows(NoCustomerException.class, () -> calDisSvc.calculateDiscount(someLines, "noCustId"));
+    }
+}
+```
+
+- 이렇게 실제 구현 없이 테스트 할 수 있는 이유는 DIP를 적용하여 고수준 모듈이 저수준 모듈에 의존하지 않도록 했기 때문이다.
+
+### 2.3.1 DIP 주의사항
+- 단순히 인터페이스와 구현 클래스를 분리하는 정도로만 받아들이면 안된다.
+- DIP의 핵심은 고수준 모듈이 저수준 모듈에 의존하지 않도록 하기 위함인데, DIP를 적용한 결과 구조만 보고 저수준 모듈에서 인터페이스를 추출하는 경우가 있다.
+
+<img width="500" alt="스크린샷 2024-05-05 오후 5 29 13" src="https://github.com/f-lab-edu/modoospace/assets/48192141/2b228e1d-8319-42a1-880d-60d1fb83ef9a">
+
+- 이 구조는 잘못된 구조이다.
+- 도메인 영역은 구현 기술을 다루는 인프라스트럭처 영역에 의존하고 있으며, 여전히 고수준 모듈이 저수준에 의존하고 있는 것이다.
+- RuleEngine 인터페이스는 고수준 모듈인 도메인 관점이 아니라 룰 엔진이라는 저수줄 모듈 관점에서 도출한 것이다.
+
+즉, DIP 적용 시엔 하위 기능을 추상화한 인터페이스는 고수준 모듈 관점에서 도출해야한다.
+- 응용 계층 입장에서 로직을 수행하기 위해선, 룰 엔진을 사용할지 직접 연산을 하는지 중요하지 않다.
+- 단지 규칙에 따라 로직을 수행하는 것이 중요하다.
+
+<img width="500" alt="스크린샷 2024-05-05 오후 5 38 25" src="https://github.com/f-lab-edu/modoospace/assets/48192141/48869ccc-5598-4e38-ab7d-b80481b77691">
+
+### 2.3.2 DIP와 아키텍처
+- `인프라스트럭처 영역(구현 기술)` = `저수준 모듈`
+- `응용 영역`, `도메인 영역` = `고수준 모듈`
+- `인프라스트럭처 영역`이 계층 하단에 위치하는 계층형 구조와 달리, 아키텍처에 DIP를 적용하면 `인프라스트럭처 영역`이 `응용 영역`과 `도메인 영역`에 의존하는 구조가 된다.
+
+<img width="500" alt="스크린샷 2024-05-05 오후 5 41 53" src="https://github.com/f-lab-edu/modoospace/assets/48192141/f594aad5-afea-4fdb-a458-896054cef25f">
+
+- `인프라스트럭처`에 위치한 클래스가 `도메인/응용 영역`의 인터페이스를 상속받아 구현하는 구조가 되므로 `도메인/응용 영역`에 영향을 주지 않거나 최소화하면서 구현기술을 변경하는 것이 가능하다. 
+
+<img width="500" alt="스크린샷 2024-05-05 오후 5 43 10" src="https://github.com/f-lab-edu/modoospace/assets/48192141/677f1c55-12f1-48af-9dc9-aed7452efeec">
+
+- 만약 Email통지 방식에서 Sms를 추가해야한다는 요구사항이 들어왔을 경우, OrderService는 변경할 필요가 없다.
+  - 두 통지 방식을 함께 제공하는 Notifier 구현 클래스를 `인프라스트럭처`에 추가하면된다.
+- 만약 Mybatis에서 JPA를 이용하고 싶다면 JPA를 이용한 OrderRepository 구현 클래스를 `인프라스트럭처`에 추가하면된다.
+
+<img width="500" alt="스크린샷 2024-05-05 오후 5 47 56" src="https://github.com/f-lab-edu/modoospace/assets/48192141/a82c6c1c-b709-4a6d-a25a-46b3f85340e6">
+
+> DIP를 항상 적용할 필요는 없다. 구현 기술에 의존적인 코드를 도메인에 일부 포함하는게 효과적을 때도 있다. 또는 추상화 대상이 잘 떠오르지 않을 때도 있다.   
+> 이럴 때 무조건 DIP를 적용하려 하지말고 DIP의 이점을 얻는 수준에서 적용 범위를 검토해보자.
+
