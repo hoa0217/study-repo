@@ -109,5 +109,44 @@ public class CancelOrderService {
 - void delete(Order order)
 - void deleteById(OrderNo id)
 
+## 4.3 매핑구현
+### 4.3.1 엔티티와 밸류 기본 매핑 구현
+기본 규칙
+- 애그리거트 루트는 엔티티이므로 @Entitiy로 매핑 설정한다.
 
+한 테이블에 엔티티와 밸류 데이터가 같이 있다면?
+- 밸류는 @Embaddable로 매핑 설정한다.
+- 밸류 타입 프로퍼티는 @Embedded로 매핑 설정한다.
 
+<img width="500" alt="스크린샷 2024-05-12 오후 5 45 44" src="https://github.com/hoa0217/study-repo/assets/48192141/258e5d44-a98d-427f-b2c2-59f2a3c5aa9a">
+
+- 위 예시를 보면 Order는 루트 엔티티, Orderer 밸류이다.
+- 이를 JPA로 매핑을 해보면 아래와 같다.
+
+<img width="500" alt="스크린샷 2024-05-12 오후 5 47 20" src="https://github.com/hoa0217/study-repo/assets/48192141/b65e17e9-d9d1-47f8-9840-5c206fc19078">
+
+<img width="500" alt="스크린샷 2024-05-12 오후 5 47 49" src="https://github.com/hoa0217/study-repo/assets/48192141/08cf6793-50ee-4f9b-afd3-c570de93aa0f">
+
+<img width="500" alt="스크린샷 2024-05-12 오후 5 49 07" src="https://github.com/hoa0217/study-repo/assets/48192141/0feb9c82-ded5-4f94-855d-156b055b16f3">
+
+- 여기서 Orderer의 MemberId는 Member 애그리거트를 ID로 참조한다.
+- 그리고 MemberId는 다음과 같이 id프로퍼티와 매핑되는 테이블 칼럼 이름으로 member_id를 지정하고 있다.
+
+<img width="500" alt="스크린샷 2024-05-12 오후 5 51 22" src="https://github.com/hoa0217/study-repo/assets/48192141/2a77c9b3-f464-4a9a-9cf2-5f6d1ccbab10">
+
+> @AttributeOverrides는 Orderer의 memberId 프로퍼티와 매핑할 칼럼을 변경했다. member_id -> orderer_id
+
+### 4.3.2 기본 생성자
+- 엔티티와 밸류의 생성자는 객체를 생성할 때 필요한 것을 전달받는다.
+
+<img width="500" alt="스크린샷 2024-05-12 오후 5 54 34" src="https://github.com/hoa0217/study-repo/assets/48192141/46f610b0-cdb7-44f9-a924-ccdd24038ef9">
+
+- 여기서 Receiver가 불변 타입이면 생성 시점 필요한 값을 모두 전달받으므로 set 메서드는 제공하지 않는다.
+- 즉, 기본생성자를 추가할 필요가 없다는 것을 의미한다.
+- 하지만 JPA에서 @Entity와 @Embaddable로 클래스 매핑하려면 기본생성자를 제공해야한다.
+  - DB에서 데이터를 읽어와 매핑된 객체를 생성할 때 기본 생성자를 사용하여 객체를 생성하기 때문이다.
+- 이런 기술적 제약으로 필요없음에도 불구하고 **기본 생성자**를 추가해야한다.
+
+<img width="500" alt="스크린샷 2024-05-12 오후 5 56 21" src="https://github.com/hoa0217/study-repo/assets/48192141/226d657e-cb96-4380-b463-592a334e1afd">
+
+> protected로 선언한 이유는 다른코드에서 기본생성자를 사용하지 못하도록 막기 위해서 이다.
