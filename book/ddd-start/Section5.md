@@ -164,3 +164,63 @@ List<Member> findFirst3ByNameLikeOrderByName(String name); // name 기준 like �
 ```java
 Member findFirstByBlockedOrderById(boolean blocked);
 ```
+
+## 5.8 스펙 조합을 위한 스펙 빌더 클래스
+if와 스펙을 조합하는 코드가 섞여 있으면 실수하기 좋고 복잡한 구조를 갖는다. 따라서 아래와 같이 스펙 빌더를 만들어서 사용하자.
+
+<img width="500" alt="스크린샷 2024-05-19 오전 4 46 36" src="https://github.com/hoa0217/study-repo/assets/48192141/07af2aed-172f-4851-93ca-0523f0aa1f60">
+
+and(), ifTrue(), ifHasText() 외에도 필요한 메서드를 추가해서 사용하면 된다.
+
+<img width="500" alt="스크린샷 2024-05-19 오전 4 48 40" src="https://github.com/hoa0217/study-repo/assets/48192141/18d044d9-b724-44a7-8a91-e8c4cffe6a83">
+
+<img width="500" alt="스크린샷 2024-05-19 오전 4 48 56" src="https://github.com/hoa0217/study-repo/assets/48192141/4c2ddd08-53b1-4fd2-9b9c-0c43168d4d8a">
+
+## 5.9 동적 인스턴스 생성
+
+JPA는 쿼리 결과에서 임의의 객체를 동적으로 생성할 수 있는 기능을 제공한다.
+
+<img width="500" alt="스크린샷 2024-05-19 오전 4 50 42" src="https://github.com/hoa0217/study-repo/assets/48192141/876fcd77-86c9-4228-8877-63cc9204ce96">
+
+- select 절을 보면 new 키워드가 있다. new 키워드 뒤 생성할 인스턴스의 완전한 클래스 이름을 지정하고 괄호 안 생성자에 인자로 전달할 값을 지정한다.
+
+<img width="500" alt="스크린샷 2024-05-19 오전 4 54 12" src="https://github.com/hoa0217/study-repo/assets/48192141/93bb9d87-563c-4ee5-853f-129d1e337150">
+
+- 조회 전용 모델을 만드는 이유는 표현 영역을 통해 사용자에게 데이터를 보여주기 위함이다.
+- 많은 웹 프레임워크는 새로 추가한 밸류 타입을 알맞은 형식으로 출력하지 못하므로 위 코드처럼 값을 기본 타입으로 변환하면 편리하다.
+
+동적 인스턴스의 장점은 JPQL을 그대로 사용하므로 객체 기준으로 쿼리를 작성하면서 동시에 지연/즉시 로딩과 같은 고민 없이 원하는 모습으로 데이터를 조회할 수 있다는 점이다.
+
+## 5.10 하이버네이트 @Subselect 사용
+
+하이버네이트는 JPA 확장 기능으로 @Subselect를 제공한다. Subselect는 쿼리 결과를 @Entity로 매핑할 수 있는 유용한 기등으로 아래는 사용예를 보여준다.
+
+<img width="500" alt="스크린샷 2024-05-19 오전 4 57 16" src="https://github.com/hoa0217/study-repo/assets/48192141/95af13e6-a46d-4dd3-8df9-6602ab436836">
+
+<img width="500" alt="스크린샷 2024-05-19 오전 4 57 46" src="https://github.com/hoa0217/study-repo/assets/48192141/2f372b06-b6cc-496c-850d-762c7acfe45b">
+
+@Immutable, @Subselect, @Synchronize는 하이버네이트 전용 애너테이션이며 이 태그를 사용하면 @Entity로 매핑할 수 있다.
+
+@Subselect: 조회쿼리를 값으로 갖는다. 해당 select 쿼리의 결과를 매핑할 테이블처럼 사용한다. 
+- DBMS가 여러 테이블을 조인해서 조회한 결과를 한 테이블처럼 보여주기 위한 용도로 뷰를 사용하는 것 처럼 @Subslect를 사용하면 쿼리 실행 결과를 매핑할 테이블처럼 사용한다.
+- 뷰를 수정할 수 없듯이 @Subselect로 조회한 @Entity 역시 수정할 수 없다.
+- 만약 매핑 필드를 수정하면 하이버네이트는 변경 내역을 반영하는 update 쿼리를 실행한다. 하지만 매핑 테이블이 없으므로 에러가 발생한다.
+- 위 문제를 방지하기 위해 @Immutable을 사용한다.
+
+@Immutable: 하이버네이트는 해당 엔티티의 매핑 필드/프로퍼티가 변경되도 DB에 반영하지 않고 무시한다.
+
+<img width="500" alt="스크린샷 2024-05-19 오전 5 10 59" src="https://github.com/hoa0217/study-repo/assets/48192141/f6a84b54-6c8c-451b-83d5-7aeb7ea55c83">
+
+- 위 코드는 Order의 상태를 변경한뒤 OrderSummary를 조회하고 있다.
+- 특별한 이유가 없으면 하이버네이트는 트랜잭션을 커밋하는 시점에 변경사항을 DB에 반영하므로, 위 코드는 최신값이 아닌 OrderSummary를 조회한다.
+- 위 문제를 해소하기 위해 @Synchronize를 사용한다.
+
+@Synchronize: 해당 엔티티와 관련된 테이블 목록을 명시한다. 이는 엔티티를 로딩하기 전, 지정한 테이블과 관련된 변경이 발생하면 flush를 먼저한다.
+- 위 코드는 @Synchronize로 purchase_order 테이블을 지정하고 있으므로, 엔티티 로딩 전 해당 테이블 변경 내역을 먼저 플러시한다.
+
+@Subselect를 사용해도 @Entity와 같기 때문에, EntityManager#find(), JPQL, Criteria를 사용해서 조회할 수 있는것이 @Subselect의 장점이다.
+
+<img width="500" alt="스크린샷 2024-05-19 오전 5 20 56" src="https://github.com/hoa0217/study-repo/assets/48192141/2cca5365-743c-44a6-91b2-b2dd165cdf0e">
+
+또한 이는 이름처럼 지정한 쿼리를 from 절의 서브쿼리로 사용한다. 먼역 서브쿼리를 사용하고 싶지않다면, 네이티브 SQL쿼리를 사용하거나 마이바티스와 같은 별도 매퍼를 사용해서 조회 기능을 구현해야한다.
+
