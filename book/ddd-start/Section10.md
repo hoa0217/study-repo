@@ -150,3 +150,83 @@ public class ShippingInfoChangedHandler {
 
 - 구매 취소 시 환불과 함께 이메일로 취소 내용을 보내고 싶다면 이메일 발송을 처리하는 핸들러를 구현하면된다.
 - 기능을 확장해도 구매 취소 로직은 수정할 필요가 없다.
+
+## 10.3 이벤트, 핸들러, 디스패처 구현
+
+실제 이벤트와 관련된 코드를 구현해보자.
+- 이벤트 클래스: 이벤트를 표현한다.
+- 디스패처: 스프링이 제공하는 ApplicationEventPublisher를 이용한다.
+- Events: 이벤트를 발행한다. 이벤트 발행을 위해 ApplicationEventPublisher를 사용한다.
+- 이벤트 핸들러: 이벤트를 수신해서 처리한다. 스프링이 제공하는 기능을 사용한다.
+
+### 10.3.1 이벤트 클래스
+이벤트를 위한 상위 타입은 존재하지 않는다. 원하는 클래스를 이벤트로 사용하면 된다.
+- 이벤트는 과거에 벌어진 상태 변화나 사건을 의미하므로, 이벤트 클래스 이름을 결정할 때 과거 시제를 사용해야하는 점만 유의하면 된다.
+- OrderCanceledEvent: 클래스 이름 뒤로 접미사로 Event를 사용해서 명시적으로 표현할 수 도 있다.
+- OrderCanceled: 간결함을 위해 과거 시제만 사용할 수 있다.
+
+이벤트 클래스는 이벤트를 처리하는데 필요한 최소한의 데이터를 포함해야한다.
+- 예를 들어 주문 취소됨 이벤트는 적어도 주문번호를 포함해야 관련 핸들러에서 후속 처리를 할 수 있다.
+
+모든 이벤트가 공통으로 갖는 프로퍼티가 존재한다면, 관련 상위 클래스를 만들고 각 이벤트 클래스가 상속받도록 할 수 있다.
+
+<img width="500" alt="스크린샷 2024-06-01 오후 11 45 26" src="https://github.com/hoa0217/study-repo/assets/48192141/99f850b1-e431-4557-877b-29e56fe1d07f">
+
+### 10.3.2 Events클래스와 ApplicationEventPublisher
+
+스프링컨테이너는 ApplicationEventPublisher도 된다.Events 클래스는 ApplicationEventPublisher를 사용해서 이벤트를 발생시킨다.
+
+<img width="500" alt="스크린샷 2024-06-02 오전 1 09 54" src="https://github.com/hoa0217/study-repo/assets/48192141/4dcc261d-617d-491b-8684-bd64392603a7">
+
+- Events 클래스는 ApplicationEventPublisher가 제공하는 publishEvent 메서드를 이용하여 이벤트를 발생시킨다.
+
+<img width="500" alt="스크린샷 2024-06-02 오전 1 16 46" src="https://github.com/hoa0217/study-repo/assets/48192141/15e7f908-53a8-4104-b596-7aa883429d08">
+
+- 그리고 Events 클래스에 ApplicationEventPublisher를 전달하기 위해 스프링 설정을 위와 같이 작성한다.
+- `eventsInitializer()`는 스프링 빈 객체를 초기화할 때 사용하는 인터페이스로, 이 기능을 사용해서 Events 클래스를 초기화한다.
+- 참고로 ApplicationContext는 ApplicationEventPublisher를 상속하고 있다.
+
+### 10.3.3 이벤트 발생과 이벤트 핸들러
+위에서 구현한 Events의 `raise()`메서드를 이용하여 이벤트를 발생시킨다.
+
+<img width="500" alt="스크린샷 2024-06-02 오전 1 20 19" src="https://github.com/hoa0217/study-repo/assets/48192141/16e0fae1-c297-4afe-956e-77fad7e10789">
+
+이벤트를 처리할 핸들러는 스프링이 제공하는 @EventListener 애너테이션을 사용해 구현한다.
+
+<img width="500" alt="스크린샷 2024-06-02 오전 1 21 06" src="https://github.com/hoa0217/study-repo/assets/48192141/8ba7acb0-ee86-4106-882e-901bbf235121">
+
+ApplicationEventPublisher의 publishEvent메서드를 실행할 때 OrderCanceledEvent 타입 객체를 전달하면, OrderCanceledEvent.class 값을 갖는 @EventListener 애너테이션을 붙인 메서드를 찾아 실행한다.
+
+### 10.3.4 흐름 정리
+
+<img width="500" alt="스크린샷 2024-06-02 오전 1 23 22" src="https://github.com/hoa0217/study-repo/assets/48192141/6af248bd-1990-4246-bc1e-e5a18dead598">
+
+1. 도메인 기능을 실행한다.
+2. 도메인 기능은 Events.raise()를 이용해서 이벤트를 발생시킨다.
+3. Events.raise()는 스프링이 제공하는 ApplicationEventPublisher를 이용해서 이벤트를 출판한다.
+4. ApplicationEventPublisher는 @EventListener(이벤트타입.class)애너테이션이 붙은 메서드를 찾아 실행한다.
+
+코드 흐름을 보면 응용 서비스와 동일한 트랜잭션 범위에서 이벤트 핸들러를 실행하고 있다.
+- 즉, 도메인 상태 변경과 이벤트 핸들러는 같은 트랜잭션 범위에서 실행된다.
+
+## 10.4 동기 이벤트 처리 문제
+
+이벤트를 사용하여 강결합 문제는 해소했지만, 외부 서비스에 영향을 받는 문제는 해결되지 못했다.
+
+<img width="500" alt="스크린샷 2024-06-02 오전 1 27 39" src="https://github.com/hoa0217/study-repo/assets/48192141/5f392546-ba6e-45a1-ae39-45daa9f6fd9f">
+
+해당 코드에서 refundService.refund()가 외부 환불 서비스와 연동한다고 가정해보자.
+- 만약 외부 환불 기능이 갑자기 느려지면 cancel()메서드도 함께 느려진다.
+- 이는 외부 서비스의 성능 저하가 바로 내 시스템의 성능 저하로 연결된다는 것을 의미한다.
+
+성능 저하뿐 아니라 트랜잭션도 문제가 된다.
+- refundService.refund()에서 익셉션이 발생하면 cancel()메서드도 트랜잭션을 롤백해야할까?
+- 트랜잭션을 롤백하면 구매취소기능을 롤백하는 것이므로 구매 취소가 실패하는 것과 같다.
+
+> 외부 환불 서비스 실행에 실패했다고 해서 반드시 트랜잭션을 롤백해야할까? 일단 구매 자체는 취소하고 환불만 재처리하거나 수동으로 처리할 수 있다.
+
+외부 시스템과 연동을 동기로 처리할 때 발생하는 성능과 트랜잭션 범위 문제의 해결방법은
+1. 이벤트를 비동기로 처리하거나
+2. 이벤트와 트랜잭션을 연계하는 것이다.
+
+## 10.5 비동기 이벤트 처리
